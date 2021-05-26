@@ -26,6 +26,7 @@ import java.util.List;
 /**
  * Freelist represents a free list of BTree nodes. Two BTree using same freelist is safe
  * when writing concurrently.
+ * It's designed to implement a memory pool.
  */
 public class FreeList {
 
