@@ -46,8 +46,15 @@ public class Node implements Cloneable, Serializable {
 
 	protected List<Node> children=new ArrayList<>();
 
-	protected FreeList freeList;
+	protected FreeList freeList=new FreeList();
 
+
+	///////////////////////////////////////////////////////////////////////////
+	// Constructor
+	///////////////////////////////////////////////////////////////////////////
+	public Node(){
+
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// Basic Operation
@@ -60,19 +67,19 @@ public class Node implements Cloneable, Serializable {
 	 * @param value inserted value
 	 * @param maxValues max available value in this node
 	 */
-	public void insert(Value value, int maxValues) {
+	public Value insert(Value value, int maxValues) {
 
 		int index=values.indexOf(value);
 		if(index!=-1){
 			// replace it with new value
 			values.set(index,value);
-			return;
+			return value;
 		}
 
 		if(children.size()==0){
 			// At this condition the node reached the leaf, and not reach maxValue, so directly insert into node
 			values.add(index,value);
-			return;
+			return null;
 		}
 
 
@@ -90,12 +97,14 @@ public class Node implements Cloneable, Serializable {
 				index++;
 			}else {
 				// find equivalent value, replace it
+				Value out=values.get(index);
 				values.set(index,value);
+				return out;
 			}
 
 		}
 
-		mutableChild(index).insert(value, maxValues);
+		return mutableChild(index).insert(value, maxValues);
 	}
 
 	/**
@@ -223,7 +232,6 @@ public class Node implements Cloneable, Serializable {
 
 		return null;
 	}
-
 
 	///////////////////////////////////////////////////////////////////////////
 	// Relevant method
@@ -469,6 +477,21 @@ public class Node implements Cloneable, Serializable {
 		Node out=children.get(children.size()-1);
 		children.remove(children.size()-1);
 		return out;
+	}
+
+	/**
+	 * Free a subtree to freelist. if freelist is full, it will break immediately.
+	 * @apiNote This only return to node pool, but not directly free node space
+	 * @param freeList node pool address
+	 */
+	public Boolean free(FreeList freeList){
+
+		for (int i = 0; i < children.size(); i++) {
+			if(!children.get(i).free(freeList)){
+				return false;
+			}
+		}
+		return freeList.recycleNode();
 	}
 
 	@Override

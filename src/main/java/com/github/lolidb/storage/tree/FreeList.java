@@ -39,39 +39,45 @@ public class FreeList {
 
 	public FreeList(int size){
 		freeList=new Node[size];
+		for (int i = 0; i < freeList.length; i++) {
+			freeList[i]=new Node();
+		}
+		cursor=size-1;
 	}
 
 	public FreeList(){
 		int size= Configuration.FREELIST_DEFAULT_SIZE;
 		freeList=new Node[size];
+		for (int i = 0; i < freeList.length; i++) {
+			freeList[i]=new Node();
+		}
+		cursor=size-1;
 	}
 
 	public Node[] getFreeList() {
 		return freeList;
 	}
 
-	public void setFreeList(Node node) {
-		if(cursor>=freeList.length){
-			logger.error("Cursor is out of the range of freelist.");
-			return;
-		}
-		freeList[cursor]=node;
-		cursor++;
-	}
-
-
 	/**
 	 * Get node at current cursor.
 	 * @return
 	 */
 	public synchronized Node getCurrentNode(){
-		return freeList[cursor];
+		return freeList[cursor--];
 	}
 
-	public synchronized boolean freeNode(){
-		cursor--;
+	/**
+	 * Recycle and reset node. Please attention new node is not relevant to outside node.
+	 * Please free space of outside node.
+	 * @return
+	 */
+	public synchronized boolean recycleNode(){
+		if(cursor+1>=freeList.length)
+			return false;
+		freeList[++cursor]=new Node();
 		return true;
 	}
+
 
 
 }
