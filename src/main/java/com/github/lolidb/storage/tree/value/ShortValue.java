@@ -27,6 +27,11 @@ public class ShortValue extends Value {
 	}
 
 	@Override
+	public int getSize() {
+		return 2;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof ShortValue))
 			return false;

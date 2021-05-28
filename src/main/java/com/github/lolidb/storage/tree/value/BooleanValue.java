@@ -27,6 +27,11 @@ public class BooleanValue extends Value {
 	}
 
 	@Override
+	public int getSize() {
+		return 1;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof BooleanValue))
 			return false;

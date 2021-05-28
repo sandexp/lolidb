@@ -27,6 +27,11 @@ public class LongValue extends Value {
 	}
 
 	@Override
+	public int getSize() {
+		return 8;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof LongValue))
 			return false;

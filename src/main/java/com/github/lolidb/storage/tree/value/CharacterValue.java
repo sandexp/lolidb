@@ -26,6 +26,11 @@ public class CharacterValue extends Value{
 	}
 
 	@Override
+	public int getSize() {
+		return 2;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof CharacterValue))
 			return false;

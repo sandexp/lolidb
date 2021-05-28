@@ -12,6 +12,10 @@ public class StructField {
 
 	private boolean isNullable;
 
+	public int size(){
+		return value.getSize();
+	}
+
 	public StructField(String name,Value value,boolean isNullable){
 		this.name=name;
 		this.type=value.getClass();

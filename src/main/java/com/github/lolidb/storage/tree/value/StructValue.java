@@ -68,4 +68,13 @@ public class StructValue extends Value {
 
 		return false;
 	}
+
+	@Override
+	public int getSize() {
+		int size=0;
+		for (StructField field:fields.values()) {
+			size+=field.size();
+		}
+		return size;
+	}
 }

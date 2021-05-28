@@ -28,6 +28,11 @@ public class FloatValue extends Value {
 	}
 
 	@Override
+	public int getSize() {
+		return 4;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof FloatValue))
 			return false;

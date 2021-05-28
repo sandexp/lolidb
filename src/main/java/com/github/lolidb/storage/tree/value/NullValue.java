@@ -20,6 +20,11 @@ public class NullValue extends Value {
 	}
 
 	@Override
+	public int getSize() {
+		return 0;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof NullValue))
 			return false;
