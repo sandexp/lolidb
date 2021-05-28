@@ -1,7 +1,7 @@
 package com.github.lolidb.storage;
 
 import com.github.lolidb.exception.IllegalSchemaException;
-import com.github.lolidb.type.DataType;
+import com.github.lolidb.storage.tree.Value;
 
 import javax.annotation.PostConstruct;
 import java.util.HashSet;
@@ -15,14 +15,14 @@ public abstract class AbstractStorageHeader {
 
 
 	/**
-	 * The name of field of schema, this will be consistent with length limit and datatype.
+	 * The name of field of schema, this will be consistent with length limit and Value.
 	 */
 	protected List<String> names;
 
 	/**
-	 * The {@link DataType} of schema, this will be consistent with length limit and name
+	 * The {@link Value} of schema, this will be consistent with length limit and name
 	 */
-	protected List<DataType> dataTypes;
+	protected List<Value> dataTypes;
 
 
 	/**
@@ -33,7 +33,7 @@ public abstract class AbstractStorageHeader {
 
 	protected int recordSize=0;
 
-	public abstract void addColumn(String name,DataType dataType,int lengthLimit);
+	public abstract void addColumn(String name,Value Value,int lengthLimit);
 
 	protected Set<String> distincts=new HashSet<>();
 
