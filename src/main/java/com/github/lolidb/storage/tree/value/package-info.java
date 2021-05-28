@@ -18,4 +18,4 @@
 /**
  * This package will define all of available data type in storage.
  */
-package com.github.lolidb.type;
+package com.github.lolidb.storage.tree.value;

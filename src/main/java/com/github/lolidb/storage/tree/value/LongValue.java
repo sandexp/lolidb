@@ -1,0 +1,35 @@
+package com.github.lolidb.storage.tree.value;
+
+import com.github.lolidb.storage.tree.Value;
+
+public class LongValue extends Value {
+
+	private Long value;
+
+	public LongValue(Long value){
+		this.value=value;
+	}
+
+	@Override
+	protected Value MIN() {
+		return new LongValue(Long.MIN_VALUE);
+	}
+
+	@Override
+	protected Value MAX() {
+		return new LongValue(Long.MAX_VALUE);
+	}
+
+	@Override
+	protected boolean less(Value other) {
+		assert other instanceof IntegerValue;
+		return value.compareTo(((LongValue) other).value)<0;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof LongValue))
+			return false;
+		return value.equals(((LongValue) obj).value);
+	}
+}
