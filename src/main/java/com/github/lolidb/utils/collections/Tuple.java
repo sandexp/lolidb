@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 public abstract class Tuple {
 
-	private final List<Object> values;
+	protected final List<Object> values;
 
 	public Tuple(final Object ...objects){
 		this.values= Arrays.asList(objects);
