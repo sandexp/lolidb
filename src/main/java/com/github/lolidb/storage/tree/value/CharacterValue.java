@@ -22,7 +22,12 @@ public class CharacterValue extends Value{
 
 	@Override
 	protected boolean less(Value other) {
-		return false;
+
+		if(other instanceof NullValue)
+			return true;
+
+		assert other instanceof CharacterValue;
+		return value.compareTo(((CharacterValue) other).value)<0;
 	}
 
 	@Override

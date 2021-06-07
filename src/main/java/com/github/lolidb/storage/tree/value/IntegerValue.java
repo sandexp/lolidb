@@ -22,6 +22,8 @@ public class IntegerValue extends Value {
 
 	@Override
 	protected boolean less(Value other) {
+		if(other instanceof NullValue)
+			return true;
 		assert other instanceof IntegerValue;
 		return value.compareTo(((IntegerValue) other).value)<0;
 	}

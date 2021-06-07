@@ -23,6 +23,8 @@ public class FloatValue extends Value {
 
 	@Override
 	protected boolean less(Value other) {
+		if(other instanceof NullValue)
+			return true;
 		assert other instanceof FloatValue;
 		return value.compareTo(((FloatValue) other).value)<0;
 	}

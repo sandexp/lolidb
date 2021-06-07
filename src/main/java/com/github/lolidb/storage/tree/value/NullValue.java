@@ -14,6 +14,11 @@ public class NullValue extends Value {
 		return new NullValue();
 	}
 
+	/**
+	 * Any other type value is greater than null value.
+	 * @param other other type value
+	 * @return
+	 */
 	@Override
 	protected boolean less(Value other) {
 		return true;

@@ -28,6 +28,8 @@ public class ByteValue extends Value {
 
 	@Override
 	protected boolean less(Value other) {
+		if (other instanceof NullValue)
+			return true;
 		assert other instanceof ByteValue;
 		return value.compareTo(((ByteValue) other).value)<0;
 	}

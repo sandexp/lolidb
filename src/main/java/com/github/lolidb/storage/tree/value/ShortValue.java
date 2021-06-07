@@ -22,6 +22,8 @@ public class ShortValue extends Value {
 
 	@Override
 	protected boolean less(Value other) {
+		if(other instanceof NullValue)
+			return true;
 		assert other instanceof ShortValue;
 		return value.compareTo(((ShortValue) other).value)<0;
 	}

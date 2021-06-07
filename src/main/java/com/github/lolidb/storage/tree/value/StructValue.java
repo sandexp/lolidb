@@ -64,6 +64,8 @@ public class StructValue extends Value {
 	@Override
 	protected boolean less(Value other) {
 
+		if(other instanceof NullValue)
+			return true;
 		assert other instanceof StructValue;
 
 		return false;
