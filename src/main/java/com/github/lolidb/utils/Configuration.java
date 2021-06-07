@@ -30,5 +30,5 @@ public class Configuration {
 	// default value
 	///////////////////////////////////////////////////////////////////////////
 
-	public static final int FREELIST_DEFAULT_SIZE=32;
+	public static final int FREELIST_DEFAULT_SIZE=64;
 }
