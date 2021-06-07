@@ -30,4 +30,9 @@ public class NullValue extends Value {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "NullValue";
+	}
 }

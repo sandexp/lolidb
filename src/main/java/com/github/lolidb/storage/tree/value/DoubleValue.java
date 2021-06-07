@@ -38,4 +38,8 @@ public class DoubleValue extends Value {
 		return value.equals(((DoubleValue) obj).value);
 	}
 
+	@Override
+	public String toString() {
+		return "DoubleValue: "+value.toString();
+	}
 }

@@ -36,4 +36,9 @@ public class CharacterValue extends Value{
 			return false;
 		return value.equals(((CharacterValue) obj).value);
 	}
+
+	@Override
+	public String toString() {
+		return "CharacterValue: "+value.toString();
+	}
 }

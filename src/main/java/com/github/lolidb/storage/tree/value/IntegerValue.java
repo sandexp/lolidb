@@ -38,4 +38,9 @@ public class IntegerValue extends Value {
 		return value.equals(((IntegerValue) obj).value);
 	}
 
+	@Override
+	public String toString() {
+		return "IntegerValue: "+value.toString();
+	}
+
 }

@@ -77,4 +77,19 @@ public class StructValue extends Value {
 		}
 		return size;
 	}
+
+	@Override
+	public String toString() {
+		StringBuffer buffer=new StringBuffer("{\n");
+		for (String name:fields.keySet()) {
+			buffer.append("\"")
+				.append(name)
+				.append("\" :")
+				.append("\"")
+				.append(fields.get(name))
+				.append("\",");
+		}
+		buffer.deleteCharAt(buffer.length()-1).append("\n}");
+		return buffer.toString();
+	}
 }

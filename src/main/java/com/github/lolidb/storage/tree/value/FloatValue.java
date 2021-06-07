@@ -38,4 +38,9 @@ public class FloatValue extends Value {
 			return false;
 		return value.equals(((FloatValue) obj).value);
 	}
+
+	@Override
+	public String toString() {
+		return "FloatValue: "+value.toString();
+	}
 }

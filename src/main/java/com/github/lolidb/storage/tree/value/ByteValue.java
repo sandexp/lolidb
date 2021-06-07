@@ -44,4 +44,8 @@ public class ByteValue extends Value {
 		return value.equals(((ByteValue) obj).value);
 	}
 
+	@Override
+	public String toString() {
+		return "ByteValue: "+ value.toString();
+	}
 }

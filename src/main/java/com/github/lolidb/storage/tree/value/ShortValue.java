@@ -37,4 +37,9 @@ public class ShortValue extends Value {
 			return false;
 		return value.equals(((ShortValue) obj).value);
 	}
+
+	@Override
+	public String toString() {
+		return "ShortValue: "+value.toString();
+	}
 }

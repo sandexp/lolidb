@@ -37,4 +37,9 @@ public class LongValue extends Value {
 			return false;
 		return value.equals(((LongValue) obj).value);
 	}
+
+	@Override
+	public String toString() {
+		return "LongValue: "+value.toString();
+	}
 }

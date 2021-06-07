@@ -37,4 +37,9 @@ public class BooleanValue extends Value {
 			return false;
 		return value.equals(((BooleanValue) obj).value);
 	}
+
+	@Override
+	public String toString() {
+		return "BooleanValue: "+value.toString();
+	}
 }
