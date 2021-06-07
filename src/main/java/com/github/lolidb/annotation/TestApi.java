@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
 public @interface TestApi {
 
-	String description="";
+	public String description="";
 }
