@@ -53,6 +53,6 @@ public abstract class Tuple {
 	}
 
 	public Object get(int index){
-		return this.values.indexOf(index);
+		return this.values.get(index);
 	}
 }
