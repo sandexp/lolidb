@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Describe an value in btree, should be comparable.
  */
-public abstract class Value implements Comparable,Cloneable{
+public abstract class Value implements Cloneable{
 
 	// min value of whole range
 	protected abstract Value MIN();
@@ -30,12 +30,13 @@ public abstract class Value implements Comparable,Cloneable{
 	// max value of whole range
 	protected abstract Value MAX();
 
-	protected abstract boolean less(Value value);
+	protected abstract boolean less(Value other);
 
 	/**
 	 * This register will storage physical address with same value as spill pages.
 	 */
 	protected Set<Long> spillPages=new HashSet<>();
 
+	public abstract int getSize();
 }
 

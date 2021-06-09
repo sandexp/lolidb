@@ -17,6 +17,7 @@
 
 package com.github.lolidb.storage.tree;
 
+import com.github.lolidb.annotation.TestApi;
 import com.github.lolidb.utils.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,10 @@ public class FreeList {
 	protected Node[] freeList;
 
 
+	/**
+	 * Create a free list with given capacity.
+	 * @param size
+	 */
 	public FreeList(int size){
 		freeList=new Node[size];
 		for (int i = 0; i < freeList.length; i++) {
@@ -45,6 +50,9 @@ public class FreeList {
 		cursor=size-1;
 	}
 
+	/**
+	 * Create a free list with default capacity {@link Configuration} {@code FREELIST_DEFAULT_SIZE}.
+	 */
 	public FreeList(){
 		int size= Configuration.FREELIST_DEFAULT_SIZE;
 		freeList=new Node[size];
@@ -54,13 +62,19 @@ public class FreeList {
 		cursor=size-1;
 	}
 
+	/**
+	 * This api can only for test, it can not be used from outside. And it will be removed soon.
+	 * @return free list info
+	 */
+	@TestApi
+	@Deprecated
 	public Node[] getFreeList() {
 		return freeList;
 	}
 
 	/**
-	 * Get node at current cursor.
-	 * @return
+	 * Get node at current cursor from free list.
+	 * @return an available node
 	 */
 	public synchronized Node getCurrentNode(){
 		return freeList[cursor--];
@@ -69,7 +83,7 @@ public class FreeList {
 	/**
 	 * Recycle and reset node. Please attention new node is not relevant to outside node.
 	 * Please free space of outside node.
-	 * @return
+	 * @return whether recycle process is ok, when the pool is full, this method will return {@code false}.
 	 */
 	public synchronized boolean recycleNode(){
 		if(cursor+1>=freeList.length)
@@ -79,5 +93,12 @@ public class FreeList {
 	}
 
 
-
+	/**
+	 * Get the position of cursor, it can be used to known the available node in free list.
+	 * @return position of cursor
+	 */
+	@TestApi
+	public int getCursor() {
+		return cursor;
+	}
 }

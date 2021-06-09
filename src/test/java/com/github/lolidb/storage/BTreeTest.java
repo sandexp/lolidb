@@ -4,6 +4,7 @@ import com.github.lolidb.storage.tree.BTree;
 import com.github.lolidb.storage.tree.FreeListFactory;
 import com.github.lolidb.storage.tree.Node;
 import com.github.lolidb.storage.tree.value.IntegerValue;
+import com.github.lolidb.storage.tree.value.NullValue;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +104,15 @@ public class BTreeTest {
 	@Test
 	public void testBtree(){
 
+		bTree=new BTree(3, FreeListFactory.get());
 
+		for (int i = 0; i < 30; i++) {
+			bTree.replaceOrInsert(new IntegerValue(i));
+		}
+
+		bTree.print();
+		System.out.println("=============================");
+		bTree.printTree();
 	}
 
 	/**
@@ -112,6 +121,16 @@ public class BTreeTest {
 	@Test
 	public void traverse(){
 
+		bTree=new BTree(3, FreeListFactory.get());
+
+		for (int i = 0; i < 30; i++) {
+			bTree.replaceOrInsert(new IntegerValue(i));
+		}
+
+		List list = bTree.range(new NullValue(), new NullValue(), true, true);
+		list.forEach(x->{
+			System.out.print(x+" ");
+		});
 	}
 
 	@Test
@@ -120,8 +139,38 @@ public class BTreeTest {
 	}
 
 	@Test
-	public void testRemove(){
+	public void testRemoveLeafNode(){
 
+		bTree=new BTree(3, FreeListFactory.get());
+
+		for (int i = 0; i < 4; i++) {
+			bTree.replaceOrInsert(new IntegerValue(i));
+		}
+
+		System.out.println("===========================");
+		System.out.println(bTree.getRoot());
+
+		bTree.remove(new IntegerValue(1));
+
+		System.out.println(bTree.getRoot());
+	}
+
+	@Test
+	public void testRemoveNotLeafNode(){
+		bTree=new BTree(3, FreeListFactory.get());
+
+		for (int i = 0; i < 7; i++) {
+			bTree.replaceOrInsert(new IntegerValue(i));
+		}
+		System.out.println("===========================");
+		System.out.println(bTree.getRoot());
+		System.out.println(bTree.getRoot().getChild(0));
+		System.out.println(bTree.getRoot().getChild(1));
+		System.out.println("===========================");
+		bTree.remove(new IntegerValue(5));
+		System.out.println(bTree.getRoot());
+		System.out.println(bTree.getRoot().getChild(0));
+		System.out.println(bTree.getRoot().getChild(1));
 	}
 
 	@Test
@@ -142,8 +191,22 @@ public class BTreeTest {
 			Node node = bTree.get(new IntegerValue(i));
 			System.out.println(node);
 		}
+	}
 
+	@Test
+	public void testContain(){
 
+		bTree=new BTree(3, FreeListFactory.get());
+
+		for (int i = 0; i < 30; i++) {
+			bTree.replaceOrInsert(new IntegerValue(i));
+		}
+
+		boolean f1 = bTree.contain(new IntegerValue(15));
+		boolean f2 = bTree.contain(new IntegerValue(33));
+
+		System.out.println(f1);
+		System.out.println(f2);
 	}
 
 	@Test
@@ -155,11 +218,74 @@ public class BTreeTest {
 			bTree.replaceOrInsert(new IntegerValue(i));
 		}
 
-		List ans=bTree.range(new IntegerValue(6),new IntegerValue(15),true,true);
+		System.out.println("===========================");
+		System.out.println(bTree.getRoot());
+		System.out.println(bTree.getRoot().getChild(0));
+		System.out.println(bTree.getRoot().getChild(0).getChild(0));
+		System.out.println(bTree.getRoot().getChild(0).getChild(1));
+		System.out.println(bTree.getRoot().getChild(0).getChild(2));
+		System.out.println("===========================");
+		System.out.println(bTree.getRoot().getChild(1));
+		System.out.println(bTree.getRoot().getChild(1).getChild(0));
+		System.out.println(bTree.getRoot().getChild(1).getChild(1));
+		System.out.println(bTree.getRoot().getChild(1).getChild(2));
+		System.out.println("===========================");
+		System.out.println(bTree.getRoot().getChild(2));
+		System.out.println(bTree.getRoot().getChild(2).getChild(0));
+		System.out.println(bTree.getRoot().getChild(2).getChild(1));
+		System.out.println(bTree.getRoot().getChild(2).getChild(2));
+		System.out.println(bTree.getRoot().getChild(2).getChild(3));
+		System.out.println("===========================");
 
+		System.out.println(String.format("Show value ( %s , %s ]",6,15));
+		List ans=bTree.range(new IntegerValue(6),new IntegerValue(15),false,true);
 		ans.forEach(x->{
 			System.out.println(x);
 		});
+
+		System.out.println("============================");
+		System.out.println(String.format("Show value ( %s , %s )",6,15));
+		ans=bTree.range(new IntegerValue(6),new IntegerValue(15),false,false);
+		ans.forEach(x->{
+			System.out.println(x);
+		});
+
+		System.out.println("============================");
+		System.out.println(String.format("Show value [ %s , %s )",6,15));
+		ans=bTree.range(new IntegerValue(6),new IntegerValue(15),true,false);
+		ans.forEach(x->{
+			System.out.println(x);
+		});
+
+		System.out.println("============================");
+		System.out.println(String.format("Show value [ %s , %s ]",6,15));
+		ans=bTree.range(new IntegerValue(6),new IntegerValue(15),true,true);
+		ans.forEach(x->{
+			System.out.println(x);
+		});
+
+		System.out.println("============================");
+		System.out.println(String.format("Show value [ %s , +infinite )",6));
+		ans=bTree.range(new IntegerValue(6),new NullValue(),true,true);
+		ans.forEach(x->{
+			System.out.println(x);
+		});
+
+		System.out.println("============================");
+		System.out.println(String.format("Show value ( -infinite , +infinite )"));
+		ans=bTree.range(new NullValue(),new NullValue(),true,true);
+		ans.forEach(x->{
+			System.out.println(x);
+		});
+
+		System.out.println("============================");
+		System.out.println(String.format("Show value [ -infinite , %s ]",6));
+		ans=bTree.range(new NullValue(),new IntegerValue(6),true,true);
+		ans.forEach(x->{
+			System.out.println(x);
+		});
+
+		System.out.println("============================");
 	}
 
 	@Test

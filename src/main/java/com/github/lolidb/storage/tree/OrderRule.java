@@ -1,4 +1,6 @@
 package com.github.lolidb.storage.tree;
 
-public class CopyOnWriteContext {
+public enum OrderRule {
+	ASCEND,
+	DESCEND
 }

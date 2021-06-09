@@ -17,9 +17,12 @@
 
 package com.github.lolidb.storage.tree;
 
+import com.github.lolidb.annotation.TestApi;
 import com.github.lolidb.utils.collections.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * B- Tree Implementation.
@@ -37,20 +40,24 @@ public class BTree implements Cloneable{
 
 	protected FreeList freeList;
 
-	public BTree(int degree){
+	public BTree(int degree,FreeList freeList){
 		this.degree=degree;
 		this.length=0;
 		this.root=null;
-		this.freeList=new FreeList();
+		this.freeList=freeList;
+	}
+
+	@TestApi
+	public Node getRoot() {
+		return root;
 	}
 
 	// swallow copy
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		BTree bTree = new BTree(this.degree);
+		BTree bTree = new BTree(this.degree,freeList);
 		bTree.length=this.length;
 		bTree.root=this.root;
-		bTree.freeList=new FreeList();
 		return bTree;
 	}
 
@@ -67,7 +74,7 @@ public class BTree implements Cloneable{
 	 * Replace or insert a value into btree.
 	 * @param value
 	 */
-	public Value replaceOrInsert(Value value){
+	public Node replaceOrInsert(Value value){
 
 		if (value==null){
 			logger.warn("Insert value is null.");
@@ -75,44 +82,45 @@ public class BTree implements Cloneable{
 		}
 
 		if(root==null){
-			root=freeList.getCurrentNode();
-			root.values.add(value);
+			root=freeList.getCurrentNode().setValuesSize(maxValues());
+			root.insert(value,maxValues());
 			length++;
-			return value;
+			return root;
 		}
 
-		root=root.mutableFor(freeList);
-
-		if(root.values.size()>=maxValues()){
+		if(root.valueNums>=maxValues()){
 			Tuple2<Value, Node> split = root.split(maxValues() / 2);
 			Node oldRoot=root;
 			Node root = freeList.getCurrentNode();
-			root.values.add((Value) split.get(0));
-			root.children.add(oldRoot);
-			root.children.add((Node) split.get(1));
+			root.insert((Value) split.get(0),maxValues());
 		}
 
-		Value out = root.insert(value, maxValues());
+		Node out = root.insert(value, maxValues());
 
-		if(out==null)
+		if(out!=null)
 			length++;
 
-		return out;
+		root= out;
+		// relocate root
+		while (root.parent!=null){
+			root=root.parent;
+		}
+		return root;
 
 	}
 
-	public void remove(Value value,RemoveType type){
-		root.remove(value,minValues(),type);
+	public void remove(Value value){
+		root.remove(value,minValues());
+		// when merge operation make root disappear, make root be the child
+		if(root.valueNums==0){
+			for (int i = 0; i < root.childNums; i++) {
+				if(root.children[i]!=null){
+					root=root.children[i];
+					break;
+				}
+			}
+		}
 	}
-
-	public void removeMax(){
-		root.remove(null,minValues(),RemoveType.REMOVE_MAX);
-	}
-
-	public void removeMin(){
-		root.remove(null,minValues(),RemoveType.REMOVE_MIN);
-	}
-
 
 	/**
 	 * Fetch value range {@code from} -> {@code to}
@@ -121,8 +129,9 @@ public class BTree implements Cloneable{
 	 * @param hasStart whether can be from
 	 * @param hasEnd whether can be to
 	 */
-	public void range(Value from,Value to,boolean hasStart,boolean hasEnd){
-
+	public List range(Value from,Value to,boolean hasStart,boolean hasEnd){
+		List<Value> list = root.iterate(from, to, hasStart, hasEnd);
+		return list;
 	}
 
 	public Node get(Value key){
@@ -137,30 +146,13 @@ public class BTree implements Cloneable{
 	}
 
 	public Value min(Node root){
-
-		if(root.values.size()==0)
-			return null;
-
-		if(root.children.size()>0){
-			root=root.children.get(0);
-			return min(root);
-		}
-
-		return root.values.get(0);
+		return null;
 	}
 
 
 	public Value max(Node root){
 
-		if(root.values.size()==0)
-			return null;
-
-		if(root.children.size()>0){
-			root=root.children.get(root.children.size()-1);
-			return max(root);
-		}
-
-		return root.values.get(root.values.size()-1);
+		return null;
 	}
 
 	public boolean contain(Value key){
@@ -176,4 +168,13 @@ public class BTree implements Cloneable{
 		return length;
 	}
 
+
+	public void print(){
+		this.root.print();
+	}
+
+
+	public void printTree(){
+		this.root.printTree();
+	}
 }
