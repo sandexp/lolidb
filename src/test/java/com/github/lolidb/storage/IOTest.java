@@ -17,12 +17,52 @@
 
 package com.github.lolidb.storage;
 
+import org.junit.Test;
+
+import java.io.*;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
 /**
  * Test IO operation with java nio
  */
 public class IOTest {
 
+	private static String filePath="E:/data/nioTest.txt";
 
+	@Test
+	public void writeTest() throws IOException {
+		File file=new File(filePath);
+		FileOutputStream fis = new FileOutputStream(file);
+		FileChannel channel = fis.getChannel();
+
+
+		String data="this is loli db, a toy relation database.";
+
+		ByteBuffer buffer = ByteBuffer.allocate(128);
+		buffer.clear();
+		buffer.put(data.getBytes());
+		buffer.flip();
+
+		channel.write(buffer);
+
+		channel.close();
+	}
+
+	@Test
+	public void readTest() throws Exception {
+		File file=new File(filePath);
+		FileInputStream fis=new FileInputStream(file);
+
+		FileChannel channel = fis.getChannel();
+		ByteBuffer buffer=ByteBuffer.allocate((int) channel.size());
+		channel.read(buffer);
+		Buffer bf = buffer.flip();
+
+		byte[] bt= (byte[]) bf.array();
+		System.out.println(new String(bt));
+	}
 
 
 }
