@@ -16,13 +16,17 @@
 
 package com.github.lolidb.storage.tree;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Describe an value in btree, should be comparable.
  */
-public abstract class Value implements Cloneable{
+public abstract class Value implements Cloneable, Serializable {
 
 	// min value of whole range
 	protected abstract Value MIN();
@@ -38,5 +42,9 @@ public abstract class Value implements Cloneable{
 	protected Set<Long> spillPages=new HashSet<>();
 
 	public abstract int getSize();
+
+	public abstract ByteBuffer writeObject(OutputStream outputStream);
+
+	public abstract Value readObject(InputStream inputStream);
 }
 
