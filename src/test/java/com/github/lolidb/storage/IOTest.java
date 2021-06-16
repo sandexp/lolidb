@@ -31,8 +31,22 @@ public class IOTest {
 
 	private static String filePath="E:/data/nioTest.txt";
 
+
 	@Test
-	public void writeTest() throws IOException {
+	public void testByteBuffer(){
+
+		String data="this is loli db, a toy relation database.";
+
+		ByteBuffer buffer = ByteBuffer.allocate(128);
+		buffer.clear();
+		buffer.put(data.getBytes());
+		buffer.flip();
+
+		System.out.println(new String(buffer.array()));
+	}
+
+	@Test
+	public void testWrite() throws IOException {
 		File file=new File(filePath);
 		FileOutputStream fis = new FileOutputStream(file);
 		FileChannel channel = fis.getChannel();
@@ -51,7 +65,7 @@ public class IOTest {
 	}
 
 	@Test
-	public void readTest() throws Exception {
+	public void testRead() throws Exception {
 		File file=new File(filePath);
 		FileInputStream fis=new FileInputStream(file);
 
