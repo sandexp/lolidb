@@ -118,6 +118,7 @@ public class ValueTest {
 		value1.readObject(buffer,4);
 		System.out.println(value1);
 	}
+
 	@Test
 	public void testSerializeDouble() throws IOException {
 		DoubleValue value = new DoubleValue(15.7735);
@@ -152,6 +153,8 @@ public class ValueTest {
 
 	@Test
 	public void testSerializeStructType(){
+
+		StructValue value = new StructValue();
 
 	}
 
