@@ -59,9 +59,11 @@ public class IntegerValue extends Value {
 
 	@Override
 	public ByteBuffer writeObject(ByteBuffer buffer,FileChannel channel) throws IOException {
+		int pos=buffer.position();
 		buffer.putInt(value);
 		buffer.flip();
-		channel.write(buffer);
+		buffer.position(pos);
+		channel.write(buffer,pos);
 		buffer.limit(buffer.capacity());
 		return buffer;
 	}

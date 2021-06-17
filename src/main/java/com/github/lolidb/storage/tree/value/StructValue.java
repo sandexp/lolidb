@@ -21,6 +21,9 @@ import com.github.lolidb.storage.tree.OrderRule;
 import com.github.lolidb.storage.tree.Value;
 import com.github.lolidb.utils.collections.Tuple2;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.*;
 
 /**
@@ -28,22 +31,18 @@ import java.util.*;
  */
 public class StructValue extends Value {
 
-	private Map<String,StructField> fields;
+	private LinkedHashSet<StructField> fields;
 
-	private Tuple2<String, OrderRule> orderFields;
+	public StructValue(){
+		this.fields=new LinkedHashSet<>();
+	}
 
-	public StructValue(Map<String,StructField> fields,Tuple2<String,OrderRule> orderFields){
+	public StructValue(LinkedHashSet<StructField> fields){
 		this.fields=fields;
-		this.orderFields=orderFields;
 	}
 
-	public StructValue addField(String name,StructField field){
-		fields.put(name,field);
-		return this;
-	}
-
-	public StructValue setRule(Tuple2<String,OrderRule> ordering){
-		orderFields=ordering;
+	public StructValue addField(StructField field){
+		fields.add(field);
 		return this;
 	}
 
@@ -57,12 +56,11 @@ public class StructValue extends Value {
 			return false;
 		}
 
-		for (String name : fields.keySet()) {
-			if(!((StructValue) obj).fields.containsKey(name)){
+		for (StructField field:fields) {
+			if(!((StructValue) obj).fields.contains(field)){
 				return false;
 			}
 		}
-
 		return true;
 	}
 
@@ -76,39 +74,78 @@ public class StructValue extends Value {
 		return null;
 	}
 
-
-	// todo
 	@Override
 	protected boolean less(Value other) {
 
 		if(other instanceof NullValue)
 			return true;
 		assert other instanceof StructValue;
-
+		// un-comparable
 		return false;
 	}
 
 	@Override
 	public int getSize() {
 		int size=0;
-		for (StructField field:fields.values()) {
+		for (StructField field:fields) {
 			size+=field.size();
 		}
 		return size;
 	}
 
 	@Override
+	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException {
+		for (StructField field:fields) {
+			field.getValue().writeObject(buffer,channel);
+		}
+		return buffer;
+	}
+
+	@Override
+	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
+		int size=0;
+		for (StructField field: fields) {
+			field.getValue().readObject(buffer,offset+size);
+			size+=length(field.getValue());
+		}
+		return this;
+	}
+
+	private int length(Value value){
+		if(value instanceof IntegerValue)
+			return 4;
+		if(value instanceof ShortValue)
+			return 2;
+		if(value instanceof ByteValue)
+			return 1;
+		if(value instanceof LongValue)
+			return 8;
+		if(value instanceof BooleanValue)
+			return 4;
+		if(value instanceof FloatValue)
+			return 4;
+		if(value instanceof DoubleValue)
+			return 8;
+		if(value instanceof CharacterValue)
+			return 2;
+		if(value instanceof NullValue)
+			return 0;
+		return 0;
+	}
+
+	@Override
 	public String toString() {
 		StringBuffer buffer=new StringBuffer("{\n");
-		for (String name:fields.keySet()) {
+		for (StructField field:fields) {
 			buffer.append("\"")
-				.append(name)
+				.append(field.getName())
 				.append("\" :")
 				.append("\"")
-				.append(fields.get(name))
+				.append(field.getValue())
 				.append("\",");
 		}
 		buffer.deleteCharAt(buffer.length()-1).append("\n}");
 		return buffer.toString();
 	}
+
 }

@@ -58,8 +58,10 @@ public class LongValue extends Value {
 
 	@Override
 	public ByteBuffer writeObject(ByteBuffer buffer,FileChannel channel) throws IOException {
+		int pos=buffer.position();
 		buffer.putLong(value);
 		buffer.flip();
+		buffer.position(pos);
 		channel.write(buffer);
 		buffer.limit(buffer.capacity());
 		return buffer;

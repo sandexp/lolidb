@@ -24,8 +24,6 @@ public class StructField {
 
 	private String name;
 
-	private Class type;
-
 	private Value value;
 
 	private boolean isNullable;
@@ -36,7 +34,6 @@ public class StructField {
 
 	public StructField(String name,Value value,boolean isNullable){
 		this.name=name;
-		this.type=value.getClass();
 		this.value=value;
 		this.isNullable=isNullable;
 	}
@@ -50,12 +47,18 @@ public class StructField {
 		if(!(obj instanceof StructField))
 			return false;
 
-		if(!((StructField) obj).type.getName().equals(type.getName()))
-			return false;
-
 		if (!name.equals(((StructField) obj).name))
 			return false;
 
 		return value.equals(((StructField) obj).value);
+	}
+
+
+	public String getName() {
+		return name;
+	}
+
+	public Value getValue() {
+		return value;
 	}
 }
