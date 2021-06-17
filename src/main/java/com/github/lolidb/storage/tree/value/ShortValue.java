@@ -19,6 +19,13 @@ package com.github.lolidb.storage.tree.value;
 
 import com.github.lolidb.storage.tree.Value;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
 public class ShortValue extends Value {
 	
 	private Short value;
@@ -48,6 +55,21 @@ public class ShortValue extends Value {
 	@Override
 	public int getSize() {
 		return 2;
+	}
+
+	@Override
+	public ByteBuffer writeObject(ByteBuffer buffer,FileChannel channel) throws IOException {
+		buffer.putShort(value);
+		buffer.flip();
+		channel.write(buffer);
+		buffer.limit(buffer.capacity());
+		return buffer;
+	}
+
+	@Override
+	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
+		this.value=buffer.getShort(offset);
+		return this;
 	}
 
 	@Override

@@ -19,6 +19,12 @@ package com.github.lolidb.storage.tree.value;
 
 import com.github.lolidb.storage.tree.Value;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
 public class NullValue extends Value {
 
 	@Override
@@ -44,6 +50,16 @@ public class NullValue extends Value {
 	@Override
 	public int getSize() {
 		return 0;
+	}
+
+	@Override
+	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) {
+		return null;
+	}
+
+	@Override
+	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
+		return null;
 	}
 
 	@Override

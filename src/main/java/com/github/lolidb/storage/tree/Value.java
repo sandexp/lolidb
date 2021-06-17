@@ -16,10 +16,10 @@
 
 package com.github.lolidb.storage.tree;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,8 +43,20 @@ public abstract class Value implements Cloneable, Serializable {
 
 	public abstract int getSize();
 
-	public abstract ByteBuffer writeObject(OutputStream outputStream);
+	/**
+	 * Write {@link Value} to buffer, this buffer may be shared with other {@link Value}
+	 * @return nio buffer address
+	 * @throws IOException
+	 */
+	public abstract ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException;
 
-	public abstract Value readObject(InputStream inputStream);
+
+	/**
+	 * Read {@link Value} from buffer. This buffer need to be ensured to have enough space.
+	 * @param buffer nio buffer
+	 * @return de-serialized {@link Value}
+	 * @throws IOException
+	 */
+	public abstract Value readObject(ByteBuffer buffer,int offset) throws IOException;
 }
 

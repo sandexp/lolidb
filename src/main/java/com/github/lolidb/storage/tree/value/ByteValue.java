@@ -19,6 +19,10 @@ package com.github.lolidb.storage.tree.value;
 
 import com.github.lolidb.storage.tree.Value;
 
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
 public class ByteValue extends Value {
 
 	private Byte value;
@@ -55,6 +59,24 @@ public class ByteValue extends Value {
 	public int getSize() {
 		return 1;
 	}
+
+	@Override
+	public ByteBuffer writeObject(ByteBuffer buffer,FileChannel channel) throws IOException {
+		buffer.put(value);
+		buffer.flip();
+		channel.write(buffer);
+		buffer.limit(buffer.capacity());
+		return buffer;
+	}
+
+
+	@Override
+	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
+		// skip to offset
+		this.value=buffer.get(offset);
+		return this;
+	}
+
 
 	@Override
 	public boolean equals(Object obj) {

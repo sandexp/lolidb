@@ -19,6 +19,10 @@ package com.github.lolidb.storage.tree.value;
 
 import com.github.lolidb.storage.tree.Value;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
 public class BooleanValue extends Value {
 
 	private Boolean value;
@@ -50,6 +54,22 @@ public class BooleanValue extends Value {
 		return 1;
 	}
 
+	// write boolean as int
+	@Override
+	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException {
+		buffer.putInt(value?1:0);
+		buffer.flip();
+		channel.write(buffer);
+		buffer.limit(buffer.capacity());
+		return buffer;
+	}
+
+	@Override
+	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
+		this.value=buffer.getInt(offset)==1;
+		return this;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof BooleanValue))
@@ -61,4 +81,5 @@ public class BooleanValue extends Value {
 	public String toString() {
 		return "BooleanValue: "+value.toString();
 	}
+
 }
