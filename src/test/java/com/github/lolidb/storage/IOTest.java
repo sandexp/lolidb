@@ -78,9 +78,5 @@ public class IOTest {
 		System.out.println(new String(bt));
 	}
 
-	@Test
-	public void testFile() throws IOException {
-
-	}
 
 }

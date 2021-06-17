@@ -17,7 +17,7 @@
 
 package com.github.lolidb.storage;
 
-import com.github.lolidb.utils.Configuration;
+import java.io.File;
 
 /**
  * {@link BlockId} is used for locate block in disk uniquely.
@@ -25,21 +25,53 @@ import com.github.lolidb.utils.Configuration;
 public class BlockId {
 
 
-	private int id;
+	// global unique identifier
+	protected long address;
 
-	/**
-	 * Test if this block id is valid.
-	 * When true, this value is available
-	 * @return whether this block is available
-	 */
-	public boolean isValid(){
-		return id<Configuration.DEFAULT_MAX_BLOCK_NUMBERS;
+	// used memory of current block
+	protected long usedMemory;
+
+	// this attribute register storage info
+	protected File diskLocation;
+
+	// this point to the header of this block
+	protected long startPosition;
+
+	// read/write position in file
+	protected long seekPos;
+
+	public BlockId(long address,File diskLocation){
+		this.address=address;
+		this.diskLocation=diskLocation;
 	}
 
+	public void setUsedMemory(long usedMemory) {
+		this.usedMemory = usedMemory;
+	}
 
+	public void setSeekPos(long seekPos) {
+		this.seekPos = seekPos;
+	}
 
+	public long getAddress() {
+		return address;
+	}
 
+	public long getUsedMemory() {
+		return usedMemory;
+	}
 
+	public File getDiskLocation() {
+		return diskLocation;
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof BlockId))
+			return false;
+		return this.address==((BlockId) obj).address
+				&& this.usedMemory==((BlockId) obj).usedMemory
+				&& this.diskLocation.equals(((BlockId) obj).diskLocation);
+	}
 
 }

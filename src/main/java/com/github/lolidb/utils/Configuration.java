@@ -26,9 +26,29 @@ public class Configuration {
 
 	public static final String FREELIST_OPTION_SIZE="freelist.option.size";
 
+	public static final String MAX_BLOCK_NUMBERS="max.block.numbers";
+
 	///////////////////////////////////////////////////////////////////////////
 	// default value
 	///////////////////////////////////////////////////////////////////////////
 
 	public static final int FREELIST_DEFAULT_SIZE=64;
+
+	public static final int DEFAULT_MEMORY_POOL_SIZE=16;
+
+	public static final long PAGE_SIZE_BYTES=8192;
+
+	// in lolidb, can allow at most 128 databases in sys
+	public static final int MAX_DATABASE_BITS=7;
+
+	// in lolidb, can allow at most 8192 tables in a database.
+	public static final int MAX_TABLE_IN_DATABASE_BITS=13;
+
+
+	// in lolidb, a table can at most enable 2GB data
+	// in lolidb, one page occupy 8192 bytes
+	public static final int PAGE_SIZE_BITS=13;
+
+	// in lolidb, a table can contain at most 2^31 pages
+	public static final int PAGES_BITS_IN_A_TABLE=19;
 }
