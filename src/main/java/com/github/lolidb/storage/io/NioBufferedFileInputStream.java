@@ -17,6 +17,8 @@
 
 package com.github.lolidb.storage.io;
 
+import com.github.lolidb.annotation.TestApi;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -129,7 +131,12 @@ public class NioBufferedFileInputStream extends InputStream {
 		channel.close();
 	}
 
+	@TestApi
 	public ByteBuffer getBuffer() {
 		return buffer;
+	}
+
+	public int getBufferSize(){
+		return buffer.limit();
 	}
 }
