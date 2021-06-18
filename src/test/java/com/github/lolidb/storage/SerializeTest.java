@@ -176,20 +176,44 @@ public class SerializeTest {
 		value2.writeObject(buffer,channel);
 
 		int size = value.getSize();
-		value1.setSize(value.getSize());
 		value1.readObject(buffer,0);
 		System.out.println(value1);
 
-		value1.setSize(value2.getSize());
 		value1.readObject(buffer,size);
 		System.out.println(value1);
 	}
 
 
 	@Test
-	public void testSerializeStructType(){
+	public void testSerializeStructType() throws IOException {
 
+		StructValue value = new StructValue();
 
+		value.addField(new StructField("Name",new StringValue("lolita")))
+			.addField(new StructField("Age",new IntegerValue(22)))
+			.addField(new StructField("Sex",new BooleanValue(true)));
+
+		System.out.println(value);
+
+		value.writeObject(buffer,channel);
+
+		StructValue value1=new StructValue();
+		StructValue value2=new StructValue();
+
+		// read
+		value1.format(value);
+		value1.readObject(buffer,0);
+		System.out.println(value1);
+
+		value2.addField(new StructField("Name",new StringValue("sp")))
+			.addField(new StructField("Grade",new FloatValue(77.92f)))
+			.addField(new StructField("Sex",new BooleanValue(false)));
+
+		value2.writeObject(buffer,channel);
+
+		value1.format(value2);
+		value1.readObject(buffer,24);
+		System.out.println(value1);
 	}
 
 }
