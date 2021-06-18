@@ -34,6 +34,10 @@ public class CharacterValue extends Value {
 		this.value=value;
 	}
 
+	public CharacterValue(){
+		this.value='\0';
+	}
+
 	@Override
 	protected Value MIN() {
 		return new CharacterValue(Character.MIN_VALUE);
@@ -74,6 +78,11 @@ public class CharacterValue extends Value {
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		this.value=buffer.getChar(offset);
 		return this;
+	}
+
+	@Override
+	public void setDefault() {
+		this.value='\0';
 	}
 
 	@Override

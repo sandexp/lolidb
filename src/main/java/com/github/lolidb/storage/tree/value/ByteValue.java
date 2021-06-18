@@ -31,6 +31,10 @@ public class ByteValue extends Value {
 		this.value=value;
 	}
 
+	public ByteValue(){
+		this.value=(byte)0;
+	}
+
 	public Byte getValue() {
 		return value;
 	}
@@ -77,6 +81,11 @@ public class ByteValue extends Value {
 		// skip to offset
 		this.value=buffer.get(offset);
 		return this;
+	}
+
+	@Override
+	public void setDefault() {
+		this.value=0;
 	}
 
 

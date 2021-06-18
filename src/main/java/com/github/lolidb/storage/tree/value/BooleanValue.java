@@ -31,6 +31,10 @@ public class BooleanValue extends Value {
 		this.value=value;
 	}
 
+	public BooleanValue(){
+		this.value=true;
+	}
+
 	@Override
 	protected Value MIN() {
 		return new BooleanValue(false);
@@ -51,7 +55,7 @@ public class BooleanValue extends Value {
 
 	@Override
 	public int getSize() {
-		return 1;
+		return 4;
 	}
 
 	// write boolean as int
@@ -68,6 +72,11 @@ public class BooleanValue extends Value {
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		this.value=buffer.getInt(offset)==1;
 		return this;
+	}
+
+	@Override
+	public void setDefault() {
+		this.value=true;
 	}
 
 	@Override

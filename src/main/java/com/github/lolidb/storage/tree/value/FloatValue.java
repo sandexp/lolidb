@@ -34,6 +34,9 @@ public class FloatValue extends Value {
 		this.value=value;
 	}
 
+	public FloatValue(){
+		this.value=0f;
+	}
 
 	@Override
 	protected Value MIN() {
@@ -73,6 +76,11 @@ public class FloatValue extends Value {
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		this.value=buffer.getFloat(offset);
 		return this;
+	}
+
+	@Override
+	public void setDefault() {
+		this.value=0f;
 	}
 
 	@Override

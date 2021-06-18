@@ -34,6 +34,10 @@ public class IntegerValue extends Value {
 		this.value=value;
 	}
 
+	public IntegerValue(){
+		this.value=0;
+	}
+
 	@Override
 	protected Value MIN() {
 		return new IntegerValue(Integer.MIN_VALUE);
@@ -72,6 +76,11 @@ public class IntegerValue extends Value {
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		this.value=buffer.getInt(offset);
 		return this;
+	}
+
+	@Override
+	public void setDefault() {
+		this.value=0;
 	}
 
 

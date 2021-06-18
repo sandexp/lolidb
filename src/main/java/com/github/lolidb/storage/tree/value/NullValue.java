@@ -63,6 +63,11 @@ public class NullValue extends Value {
 	}
 
 	@Override
+	public void setDefault() {
+		// nop
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof NullValue))
 			return false;

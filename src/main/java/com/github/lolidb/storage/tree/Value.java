@@ -58,5 +58,8 @@ public abstract class Value implements Cloneable, Serializable {
 	 * @throws IOException
 	 */
 	public abstract Value readObject(ByteBuffer buffer,int offset) throws IOException;
+
+
+	public abstract void setDefault();
 }
 

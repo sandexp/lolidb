@@ -6,15 +6,21 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+/**
+ * Since {@link String}'s length is not fixed. so we need to write length to file,
+ * then we can write it to file. We use int size to locate max {@link Integer} size string.
+ */
 public class StringValue extends Value {
 
 
 	private String value;
 
-	private int preAllocatedSize;
-
 	public StringValue(String value){
 		this.value=value;
+	}
+
+	public StringValue(){
+		this.value="";
 	}
 
 	// not support
@@ -36,16 +42,12 @@ public class StringValue extends Value {
 
 	@Override
 	public int getSize() {
-		return value.length()*2;
-	}
-
-	public StringValue setSize(int preAllocatedSize) {
-		this.preAllocatedSize = preAllocatedSize;
-		return this;
+		return value.length()*2+4;
 	}
 
 	@Override
 	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException {
+		buffer.putInt(value.length());
 		int pos=buffer.position();
 		for (int i = 0; i < value.length(); i++) {
 			buffer.putChar(value.charAt(i));
@@ -59,9 +61,10 @@ public class StringValue extends Value {
 
 	@Override
 	public Value readObject(ByteBuffer buffer, int offset) throws IOException {
-		int len=0;
+		int size = buffer.getInt(offset);
+		int len=4;
 		StringBuffer sb=new StringBuffer();
-		for (int i = 0; i < preAllocatedSize/2; i++) {
+		for (int i = 0; i < size; i++) {
 			sb.append(buffer.getChar(offset+len));
 			len+=2;
 		}
@@ -70,7 +73,12 @@ public class StringValue extends Value {
 	}
 
 	@Override
+	public void setDefault() {
+		this.value="";
+	}
+
+	@Override
 	public String toString() {
-		return value.toString();
+		return "StringValue: "+value.toString();
 	}
 }

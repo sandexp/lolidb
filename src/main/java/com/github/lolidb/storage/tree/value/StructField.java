@@ -61,4 +61,15 @@ public class StructField {
 	public Value getValue() {
 		return value;
 	}
+
+	public void setValue(Value value) {
+		this.value = value;
+	}
+
+	/**
+	 * Reset value to default value.
+	 */
+	public void reset(){
+		this.value.setDefault();
+	}
 }

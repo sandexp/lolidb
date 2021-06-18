@@ -34,6 +34,8 @@ public class DoubleValue extends Value {
 		this.value=value;
 	}
 
+	public DoubleValue(){ this.value=0d; }
+
 	@Override
 	protected Value MIN() {
 		return new DoubleValue(Double.MIN_VALUE);
@@ -72,6 +74,11 @@ public class DoubleValue extends Value {
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		this.value=buffer.getDouble(offset);
 		return this;
+	}
+
+	@Override
+	public void setDefault() {
+		this.value=0d;
 	}
 
 	@Override

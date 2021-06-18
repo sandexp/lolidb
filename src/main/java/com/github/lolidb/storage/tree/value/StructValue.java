@@ -17,9 +17,7 @@
 
 package com.github.lolidb.storage.tree.value;
 
-import com.github.lolidb.storage.tree.OrderRule;
 import com.github.lolidb.storage.tree.Value;
-import com.github.lolidb.utils.collections.Tuple2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -105,13 +103,21 @@ public class StructValue extends Value {
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		int size=0;
 		for (StructField field: fields) {
-			field.getValue().readObject(buffer,offset+size);
+			Value value=field.getValue().readObject(buffer,offset+size);
+			field.setValue(value);
 			size+=length(field.getValue());
 		}
 		return this;
 	}
 
+	@Override
+	public void setDefault() {
+		this.fields.clear();
+	}
+
 	private int length(Value value){
+		if(value instanceof StringValue)
+			return value.getSize();
 		if(value instanceof IntegerValue)
 			return 4;
 		if(value instanceof ShortValue)
@@ -146,6 +152,33 @@ public class StructValue extends Value {
 		}
 		buffer.deleteCharAt(buffer.length()-1).append("\n}");
 		return buffer.toString();
+	}
+
+
+	/**
+	 * Copy with value to current value.
+	 * @param value target value
+	 */
+	public void copy(Value value){
+		assert value instanceof StructValue;
+		fields.clear();
+		for (StructField field : ((StructValue) value).fields) {
+			fields.add(field);
+		}
+	}
+
+	/**
+	 * Copy schema to this value
+	 * @param value target value
+	 */
+	public void format(Value value){
+		assert value instanceof StructValue;
+		fields.clear();
+
+		for (StructField field : ((StructValue) value).fields) {
+			field.reset();
+			fields.add(field);
+		}
 	}
 
 }

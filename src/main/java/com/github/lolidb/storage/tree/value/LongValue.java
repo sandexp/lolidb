@@ -33,6 +33,10 @@ public class LongValue extends Value {
 		this.value=value;
 	}
 
+	public LongValue(){
+		this.value=0L;
+	}
+
 	@Override
 	protected Value MIN() {
 		return new LongValue(Long.MIN_VALUE);
@@ -71,6 +75,11 @@ public class LongValue extends Value {
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		this.value=buffer.getLong(offset);
 		return this;
+	}
+
+	@Override
+	public void setDefault() {
+		this.value=0L;
 	}
 
 	@Override

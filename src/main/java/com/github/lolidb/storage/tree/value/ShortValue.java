@@ -34,6 +34,10 @@ public class ShortValue extends Value {
 		this.value=value;
 	}
 
+	public ShortValue(){
+		this.value=(short)0;
+	}
+
 	@Override
 	protected Value MIN() {
 		return new ShortValue(Short.MIN_VALUE);
@@ -72,6 +76,11 @@ public class ShortValue extends Value {
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		this.value=buffer.getShort(offset);
 		return this;
+	}
+
+	@Override
+	public void setDefault() {
+		this.value=0;
 	}
 
 	@Override
