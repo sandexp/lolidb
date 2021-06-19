@@ -19,6 +19,7 @@ package com.github.lolidb.catalyst.catalog;
 import com.github.lolidb.storage.BlockId;
 import com.github.lolidb.storage.tree.value.StructValue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,11 +36,30 @@ public abstract class Table {
 
 	private StructValue schema;
 
-	private List<BlockId> blockIdList;
+	private List<Partition> partitions;
 
-	public Table(StructValue schema){
+	private File location;
+
+	private boolean isTemporary;
+
+	public Table(String tableName,File location,StructValue schema,boolean isTemporary){
+		this.tableName=tableName;
 		this.schema=schema;
-		blockIdList=new ArrayList<>();
+		this.partitions=new ArrayList<>();
+		this.isTemporary=isTemporary;
+		this.location=location;
+	}
+
+	public Table(String tableName,File location,StructValue schema){
+		this(tableName,location,schema,false);
+	}
+
+	/**
+	 * Add partition to this tablespace
+	 * @param partition target partition
+	 */
+	public void addPartition(Partition partition){
+		this.partitions.add(partition);
 	}
 
 	public abstract void open();
