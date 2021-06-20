@@ -42,7 +42,6 @@ public class Partition {
 		this(UUID.randomUUID().toString());
 	}
 
-
 	public String getName() {
 		return name;
 	}

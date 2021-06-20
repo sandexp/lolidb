@@ -16,13 +16,14 @@
  */
 package com.github.lolidb.catalyst.catalog;
 
-import com.github.lolidb.storage.BlockId;
+import com.github.lolidb.storage.Row;
+import com.github.lolidb.storage.tree.value.StructField;
 import com.github.lolidb.storage.tree.value.StructValue;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
 
 /**
  * Describe a table with given schema {@link StructValue}.
@@ -42,16 +43,25 @@ public abstract class Table {
 
 	private boolean isTemporary;
 
-	public Table(String tableName,File location,StructValue schema,boolean isTemporary){
+	private boolean isView;
+
+	private long createdTimestamp;
+
+	private long lastAccessTimestamp;
+
+	public Table(String tableName,File location,StructValue schema,boolean isTemporary,boolean isView){
 		this.tableName=tableName;
 		this.schema=schema;
 		this.partitions=new ArrayList<>();
 		this.isTemporary=isTemporary;
 		this.location=location;
+		this.isView=isView;
+		this.createdTimestamp=new Date().getTime();
+		this.lastAccessTimestamp=createdTimestamp;
 	}
 
 	public Table(String tableName,File location,StructValue schema){
-		this(tableName,location,schema,false);
+		this(tableName,location,schema,false,false);
 	}
 
 	/**
@@ -60,9 +70,24 @@ public abstract class Table {
 	 */
 	public void addPartition(Partition partition){
 		this.partitions.add(partition);
+		this.lastAccessTimestamp=new Date().getTime();
+	}
+
+	/**
+	 * TODO Add a column to schema.
+	 * @param column pending column
+	 */
+	public void addColumn(StructField column){
+		schema.addField(column);
 	}
 
 	public abstract void open();
 
 	public abstract void close();
+
+	public abstract void add(Row record);
+
+	public abstract void remove(Row record);
+
+	public abstract void get(Row record);
 }
