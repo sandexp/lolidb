@@ -29,7 +29,7 @@ import java.nio.channels.FileChannel;
  */
 public class IOTest {
 
-	private static String filePath="E:/data/nioTest.txt";
+	private static String filePath="E:/data/nioTest2.txt";
 
 
 	@Test
@@ -60,7 +60,7 @@ public class IOTest {
 		buffer.flip();
 
 		channel.write(buffer);
-
+		System.out.println(buffer.position());
 		channel.close();
 	}
 
@@ -79,4 +79,54 @@ public class IOTest {
 	}
 
 
+	@Test
+	public void testChannelWrite() throws IOException {
+
+		File file=new File(filePath);
+		FileOutputStream fis = new FileOutputStream(file);
+		FileChannel channel = fis.getChannel();
+
+
+		String data="this is loli db, a toy relation database.";
+		String data2="this is a comment.";
+
+		System.out.println("Before "+channel.position());
+		ByteBuffer buffer = ByteBuffer.allocate(128);
+		buffer.clear();
+		buffer.put(data.getBytes());
+		buffer.flip();
+
+		channel.write(buffer);
+		System.out.println("Size= "+data.length());
+		System.out.println("After "+channel.position());
+
+		buffer.clear();
+		buffer.put(data2.getBytes());
+		buffer.flip();
+
+		channel.write(buffer);
+		System.out.println("Size= "+data2.length());
+		System.out.println("After "+channel.position());
+	}
+
+	@Test
+	public void testChannelRead() throws IOException {
+
+
+		File file=new File(filePath);
+		FileInputStream fis=new FileInputStream(file);
+
+		FileChannel channel = fis.getChannel();
+
+		ByteBuffer buffer=ByteBuffer.allocate(64);
+
+		channel.read(buffer,16);
+
+		Buffer bf = buffer.flip();
+
+		byte[] bt= (byte[]) bf.array();
+
+		String res=new String(bt);
+		System.out.println(res);
+	}
 }
