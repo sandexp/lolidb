@@ -29,9 +29,12 @@ import java.util.UUID;
  */
 public class Partition {
 
-	private String name;
+	// partition name
+	protected String name;
 
-	private List<BlockId> blockIds;
+
+	// blocks inside partition
+	protected List<BlockId> blockIds;
 
 	public Partition(String name){
 		this.name=name;
@@ -48,5 +51,14 @@ public class Partition {
 
 	public void addBlock(BlockId blockId){
 		blockIds.add(blockId);
+	}
+
+	public void reset(){
+		this.blockIds.clear();
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 }
