@@ -44,12 +44,21 @@ public abstract class Value implements Cloneable, Serializable {
 	public abstract int getSize();
 
 	/**
-	 * Write {@link Value} to buffer, this buffer may be shared with other {@link Value}
+	 * Write {@link Value} to buffer, this buffer may be shared with other {@link Value}.
+	 * This method will synchronize with file channel.
 	 * @return nio buffer address
 	 * @throws IOException
 	 */
 	public abstract ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException;
 
+	/**
+	 * Write current {@link Value} into assigned {@link ByteBuffer}. When this buffer has not enough space
+	 * it will return false.
+	 * @param buffer assigned buffer
+	 * @return write result
+	 * @throws IOException
+	 */
+	public abstract boolean writeObject(ByteBuffer buffer) throws IOException;
 
 	/**
 	 * Read {@link Value} from buffer. This buffer need to be ensured to have enough space.
@@ -58,7 +67,6 @@ public abstract class Value implements Cloneable, Serializable {
 	 * @throws IOException
 	 */
 	public abstract Value readObject(ByteBuffer buffer,int offset) throws IOException;
-
 
 	public abstract void setDefault();
 }

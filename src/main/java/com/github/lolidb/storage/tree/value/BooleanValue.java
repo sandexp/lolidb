@@ -69,6 +69,14 @@ public class BooleanValue extends Value {
 	}
 
 	@Override
+	public boolean writeObject(ByteBuffer buffer) throws IOException {
+		if(buffer.position()+getSize()>=buffer.capacity())
+			return false;
+		buffer.putInt(value?1:0);
+		return true;
+	}
+
+	@Override
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		this.value=buffer.getInt(offset)==1;
 		return this;

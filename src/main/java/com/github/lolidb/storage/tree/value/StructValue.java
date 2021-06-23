@@ -100,6 +100,16 @@ public class StructValue extends Value {
 	}
 
 	@Override
+	public boolean writeObject(ByteBuffer buffer) throws IOException {
+		if(buffer.position()+getSize()>=buffer.capacity())
+			return false;
+		for (StructField field:fields) {
+			field.getValue().writeObject(buffer);
+		}
+		return true;
+	}
+
+	@Override
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		int size=0;
 		for (StructField field: fields) {

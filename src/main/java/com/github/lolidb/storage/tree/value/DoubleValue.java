@@ -71,6 +71,14 @@ public class DoubleValue extends Value {
 	}
 
 	@Override
+	public boolean writeObject(ByteBuffer buffer) throws IOException {
+		if(buffer.position()+getSize()>=buffer.capacity())
+			return false;
+		buffer.putDouble(value);
+		return true;
+	}
+
+	@Override
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		this.value=buffer.getDouble(offset);
 		return this;

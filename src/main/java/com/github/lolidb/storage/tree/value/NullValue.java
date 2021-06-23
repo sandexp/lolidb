@@ -58,6 +58,11 @@ public class NullValue extends Value {
 	}
 
 	@Override
+	public boolean writeObject(ByteBuffer buffer) throws IOException {
+		return false;
+	}
+
+	@Override
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
 		return null;
 	}

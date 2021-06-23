@@ -75,6 +75,14 @@ public class ByteValue extends Value {
 		return buffer;
 	}
 
+	@Override
+	public boolean writeObject(ByteBuffer buffer) throws IOException {
+		if(buffer.position()+getSize()>=buffer.capacity())
+			return false;
+		buffer.put(value);
+		return true;
+	}
+
 
 	@Override
 	public Value readObject(ByteBuffer buffer,int offset) throws IOException {

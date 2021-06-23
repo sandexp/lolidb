@@ -60,6 +60,17 @@ public class StringValue extends Value {
 	}
 
 	@Override
+	public boolean writeObject(ByteBuffer buffer) throws IOException {
+		if(buffer.position()+getSize()>=buffer.capacity())
+			return false;
+		buffer.putInt(value.length());
+		for (int i = 0; i < value.length(); i++) {
+			buffer.putChar(value.charAt(i));
+		}
+		return true;
+	}
+
+	@Override
 	public Value readObject(ByteBuffer buffer, int offset) throws IOException {
 		int size = buffer.getInt(offset);
 		int len=4;
