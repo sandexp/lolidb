@@ -17,6 +17,11 @@
 
 package com.github.lolidb.utils.collections;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.Arrays;
+
 /**
  * Bit Map implementation to support header info storage.
  */
@@ -30,8 +35,27 @@ public class BitMap {
 		this.capacity=capacity;
 		// use only 1/3 of capacity for storage info
 		int size=capacity%8==0?capacity/8:capacity/8+1;
-		System.out.println(size);
 		bits=new byte[size];
+	}
+
+	public BitMap(){
+		this(1024);
+	}
+
+	/**
+	 * Since frequent array copy cost much, we will use static allocate outside
+	 * @param newCapacity new capacity
+	 */
+	@Deprecated
+	public void expand(int newCapacity){
+		this.capacity=newCapacity;
+		// use only 1/3 of capacity for storage info
+		int size=capacity%8==0?capacity/8:capacity/8+1;
+		byte[] newBits=new byte[size];
+		System.arraycopy(bits,0,newBits,0,bits.length);
+		bits=newBits;
+		// free it to wait jvm to recycle it
+		newBits=null;
 	}
 
 	/**
@@ -48,6 +72,8 @@ public class BitMap {
 	 * @param code target value
 	 */
 	public void set(int code){
+		if(code>=capacity)
+			return;
 		int index=code>>3;
 		int position=code & 0x07;
 		byte tmp=(byte)(1<<((position-1)<0?8:(position-1)));
@@ -74,6 +100,8 @@ public class BitMap {
 	 * @param code target value
 	 */
 	public void unset(int code){
+		if(code>=capacity)
+			return;
 
 		if(contains(code)){
 			int position=code & 0x07;
@@ -85,4 +113,57 @@ public class BitMap {
 		}
 	}
 
+	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException {
+		writeObject(buffer);
+		buffer.flip();
+		channel.write(buffer);
+		buffer.limit(buffer.capacity());
+		return buffer;
+	}
+
+	public void writeObject(ByteBuffer buffer){
+		buffer.putInt(bits.length);
+		for (int i = 0; i < bits.length; i++) {
+			buffer.put(bits[i]);
+		}
+	}
+
+	public BitMap readObject(ByteBuffer buffer,int offset){
+		int length = buffer.getInt(offset);
+		BitMap map = new BitMap(length * 8);
+		for (int i = 0; i < map.bits.length; i++) {
+			map.bits[i]=buffer.get(4+offset+i);
+		}
+		return map;
+	}
+
+	/**
+	 * Print from high bit to low bit
+	 * @return deci-string value
+	 */
+	@Override
+	public String toString() {
+		StringBuffer buffer=new StringBuffer();
+		for (int i = bits.length-1; i >=0; i--) {
+			buffer.append(bits[i]);
+		}
+		return buffer.toString();
+	}
+
+	/**
+	 * Print from high bit to low bit
+	 * @return
+	 */
+	public String toBinaryString() {
+		StringBuffer buffer=new StringBuffer();
+		for (int i = bits.length-1; i >=0; i--) {
+
+			int c=0;
+			for (int j = 0; j < 8; j++) {
+				buffer.append((bits[i] >> (7 - j)) & 1);
+			}
+			buffer.append(" ");
+		}
+		return buffer.deleteCharAt(buffer.length()-1).toString();
+	}
 }
