@@ -53,38 +53,23 @@ public class BooleanValue extends Value {
 		return value.compareTo(((BooleanValue) other).value)<0;
 	}
 
+	public Boolean getValue() {
+		return value;
+	}
+
 	@Override
 	public int getSize() {
 		return 4;
 	}
 
-	// write boolean as int
-	@Override
-	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException {
-		buffer.putInt(value?1:0);
-		buffer.flip();
-		channel.write(buffer);
-		buffer.limit(buffer.capacity());
-		return buffer;
-	}
-
-	@Override
-	public boolean writeObject(ByteBuffer buffer) throws IOException {
-		if(buffer.position()+getSize()>=buffer.capacity())
-			return false;
-		buffer.putInt(value?1:0);
-		return true;
-	}
-
-	@Override
-	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
-		this.value=buffer.getInt(offset)==1;
-		return this;
-	}
-
 	@Override
 	public void setDefault() {
 		this.value=true;
+	}
+
+	@Override
+	public int getRealSize() {
+		return 4;
 	}
 
 	@Override

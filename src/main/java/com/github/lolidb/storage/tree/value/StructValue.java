@@ -18,10 +18,8 @@
 package com.github.lolidb.storage.tree.value;
 
 import com.github.lolidb.storage.tree.Value;
+import com.github.lolidb.utils.collections.BitMap;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.*;
 
 /**
@@ -29,17 +27,17 @@ import java.util.*;
  */
 public class StructValue extends Value {
 
-	private LinkedHashSet<StructField> fields;
+	private List<Value> fields;
 
 	public StructValue(){
-		this.fields=new LinkedHashSet<>();
+		this.fields=new ArrayList<>();
 	}
 
-	public StructValue(LinkedHashSet<StructField> fields){
+	public StructValue(ArrayList<Value> fields){
 		this.fields=fields;
 	}
 
-	public StructValue addField(StructField field){
+	public StructValue addField(Value field){
 		fields.add(field);
 		return this;
 	}
@@ -54,8 +52,8 @@ public class StructValue extends Value {
 			return false;
 		}
 
-		for (StructField field:fields) {
-			if(!((StructValue) obj).fields.contains(field)){
+		for (Value field:fields) {
+			if(fields.contains(field)){
 				return false;
 			}
 		}
@@ -82,42 +80,34 @@ public class StructValue extends Value {
 		return false;
 	}
 
+	/**
+	 * Get data size of {@link StructValue}
+	 * @return value size
+	 */
 	@Override
 	public int getSize() {
 		int size=0;
-		for (StructField field:fields) {
-			size+=field.size();
+		for (Value field:fields) {
+			size+=field.getSize();
+		}
+		return size;
+	}
+
+	/**
+	 * Get real data size in memory(bytes).
+	 * @return
+	 */
+	public int getRealSize(){
+		int size=0;
+		for (Value field:fields) {
+			size+=field.getRealSize();
 		}
 		return size;
 	}
 
 	@Override
-	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException {
-		for (StructField field:fields) {
-			field.getValue().writeObject(buffer,channel);
-		}
-		return buffer;
-	}
-
-	@Override
-	public boolean writeObject(ByteBuffer buffer) throws IOException {
-		if(buffer.position()+getSize()>=buffer.capacity())
-			return false;
-		for (StructField field:fields) {
-			field.getValue().writeObject(buffer);
-		}
-		return true;
-	}
-
-	@Override
-	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
-		int size=0;
-		for (StructField field: fields) {
-			Value value=field.getValue().readObject(buffer,offset+size);
-			field.setValue(value);
-			size+=length(field.getValue());
-		}
-		return this;
+	public Object getValue() {
+		return fields;
 	}
 
 	@Override
@@ -125,42 +115,14 @@ public class StructValue extends Value {
 		this.fields.clear();
 	}
 
-	private int length(Value value){
-		if(value instanceof StringValue)
-			return value.getSize();
-		if(value instanceof IntegerValue)
-			return 4;
-		if(value instanceof ShortValue)
-			return 2;
-		if(value instanceof ByteValue)
-			return 1;
-		if(value instanceof LongValue)
-			return 8;
-		if(value instanceof BooleanValue)
-			return 4;
-		if(value instanceof FloatValue)
-			return 4;
-		if(value instanceof DoubleValue)
-			return 8;
-		if(value instanceof CharacterValue)
-			return 2;
-		if(value instanceof NullValue)
-			return 0;
-		return 0;
-	}
-
 	@Override
 	public String toString() {
-		StringBuffer buffer=new StringBuffer("{\n");
-		for (StructField field:fields) {
-			buffer.append("\"")
-				.append(field.getName())
-				.append("\" :")
-				.append("\"")
-				.append(field.getValue())
-				.append("\",");
+		StringBuffer buffer=new StringBuffer("(");
+		for (Value field:fields) {
+			buffer.append(field.getValue())
+				.append(",");
 		}
-		buffer.deleteCharAt(buffer.length()-1).append("\n}");
+		buffer.deleteCharAt(buffer.length()-1).append(")");
 		return buffer.toString();
 	}
 
@@ -169,24 +131,9 @@ public class StructValue extends Value {
 	 * Copy with value to current value.
 	 * @param value target value
 	 */
-	public void copy(Value value){
-		assert value instanceof StructValue;
+	public void copy(StructValue value){
 		fields.clear();
-		for (StructField field : ((StructValue) value).fields) {
-			fields.add(field);
-		}
-	}
-
-	/**
-	 * Copy schema to this value
-	 * @param value target value
-	 */
-	public void format(Value value){
-		assert value instanceof StructValue;
-		fields.clear();
-
-		for (StructField field : ((StructValue) value).fields) {
-			field.reset();
+		for (Value field : value.fields) {
 			fields.add(field);
 		}
 	}

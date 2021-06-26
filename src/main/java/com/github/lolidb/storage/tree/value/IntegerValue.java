@@ -56,39 +56,24 @@ public class IntegerValue extends Value {
 		return value.compareTo(((IntegerValue) other).value)<0;
 	}
 
+	public Integer getValue() {
+		return value;
+	}
+
 	@Override
 	public int getSize() {
 		return 4;
 	}
 
-	@Override
-	public ByteBuffer writeObject(ByteBuffer buffer,FileChannel channel) throws IOException {
-		int pos=buffer.position();
-		buffer.putInt(value);
-		buffer.flip();
-		buffer.position(pos);
-		channel.write(buffer,pos);
-		buffer.limit(buffer.capacity());
-		return buffer;
-	}
-
-	@Override
-	public boolean writeObject(ByteBuffer buffer) throws IOException {
-		if(buffer.position()+getSize()>=buffer.capacity())
-			return false;
-		buffer.putInt(value);
-		return true;
-	}
-
-	@Override
-	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
-		this.value=buffer.getInt(offset);
-		return this;
-	}
 
 	@Override
 	public void setDefault() {
 		this.value=0;
+	}
+
+	@Override
+	public int getRealSize() {
+		return 4;
 	}
 
 

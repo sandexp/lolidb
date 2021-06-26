@@ -62,33 +62,17 @@ public class ShortValue extends Value {
 	}
 
 	@Override
-	public ByteBuffer writeObject(ByteBuffer buffer,FileChannel channel) throws IOException {
-		int pos=buffer.position();
-		buffer.putShort(value);
-		buffer.flip();
-		buffer.position(pos);
-		channel.write(buffer);
-		buffer.limit(buffer.capacity());
-		return buffer;
-	}
-
-	@Override
-	public boolean writeObject(ByteBuffer buffer) throws IOException {
-		if(buffer.position()+getSize()>=buffer.capacity())
-			return false;
-		buffer.putShort(value);
-		return true;
-	}
-
-	@Override
-	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
-		this.value=buffer.getShort(offset);
-		return this;
-	}
-
-	@Override
 	public void setDefault() {
 		this.value=0;
+	}
+
+	@Override
+	public int getRealSize() {
+		return 2;
+	}
+
+	public Short getValue() {
+		return value;
 	}
 
 	@Override

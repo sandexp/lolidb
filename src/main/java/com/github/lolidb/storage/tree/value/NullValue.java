@@ -47,29 +47,25 @@ public class NullValue extends Value {
 		return true;
 	}
 
+
 	@Override
 	public int getSize() {
 		return 0;
 	}
 
 	@Override
-	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) {
-		return null;
-	}
-
-	@Override
-	public boolean writeObject(ByteBuffer buffer) throws IOException {
-		return false;
-	}
-
-	@Override
-	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
-		return null;
-	}
-
-	@Override
 	public void setDefault() {
 		// nop
+	}
+
+	@Override
+	public int getRealSize() {
+		return 0;
+	}
+
+	@Override
+	public Object getValue() {
+		return null;
 	}
 
 	@Override

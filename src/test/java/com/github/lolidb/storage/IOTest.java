@@ -18,6 +18,7 @@
 package com.github.lolidb.storage;
 
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.io.*;
 import java.nio.Buffer;
@@ -27,11 +28,13 @@ import java.nio.channels.FileChannel;
 /**
  * Test IO operation with java nio
  */
+@DisplayName("IO basic test")
 public class IOTest {
 
 	private static String filePath="E:/data/nioTest2.txt";
 
 
+	@DisplayName("Basic byte buffer write/read")
 	@Test
 	public void testByteBuffer(){
 
@@ -45,6 +48,7 @@ public class IOTest {
 		System.out.println(new String(buffer.array()));
 	}
 
+	@DisplayName("Test Write Buffer")
 	@Test
 	public void testWrite() throws IOException {
 		File file=new File(filePath);
@@ -64,6 +68,7 @@ public class IOTest {
 		channel.close();
 	}
 
+	@DisplayName("Test Read Buffer")
 	@Test
 	public void testRead() throws Exception {
 		File file=new File(filePath);
@@ -79,6 +84,7 @@ public class IOTest {
 	}
 
 
+	@DisplayName("Test Write Channel")
 	@Test
 	public void testChannelWrite() throws IOException {
 
@@ -109,6 +115,7 @@ public class IOTest {
 		System.out.println("After "+channel.position());
 	}
 
+	@DisplayName("Test Read Channel")
 	@Test
 	public void testChannelRead() throws IOException {
 
@@ -128,5 +135,20 @@ public class IOTest {
 
 		String res=new String(bt);
 		System.out.println(res);
+	}
+
+	@DisplayName("Test Limit Buffer")
+	@Test
+	public void testBufferLimit(){
+
+		ByteBuffer buffer=ByteBuffer.allocate(36);
+		String s="i am a lolita kon.";
+		System.out.println(s.length());
+
+		System.out.println("Before : "+buffer.position());
+		for (int i = 0; i < s.length(); i++) {
+			buffer.putChar(s.charAt(i));
+		}
+		System.out.println("After : "+buffer.position());
 	}
 }

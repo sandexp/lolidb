@@ -58,39 +58,24 @@ public class CharacterValue extends Value {
 		return value.compareTo(((CharacterValue) other).value)<0;
 	}
 
+
+	public Character getValue() {
+		return value;
+	}
+
 	@Override
 	public int getSize() {
 		return 2;
 	}
 
 	@Override
-	public ByteBuffer writeObject(ByteBuffer buffer,FileChannel channel) throws IOException {
-		int pos=buffer.position();
-		buffer.putChar(value);
-		buffer.flip();
-		buffer.position(pos);
-		channel.write(buffer);
-		buffer.limit(buffer.capacity());
-		return buffer;
-	}
-
-	@Override
-	public boolean writeObject(ByteBuffer buffer) throws IOException {
-		if(buffer.position()+getSize()>=buffer.capacity())
-			return false;
-		buffer.putChar(value);
-		return true;
-	}
-
-	@Override
-	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
-		this.value=buffer.getChar(offset);
-		return this;
-	}
-
-	@Override
 	public void setDefault() {
 		this.value='\0';
+	}
+
+	@Override
+	public int getRealSize() {
+		return 2;
 	}
 
 	@Override

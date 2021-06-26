@@ -42,50 +42,22 @@ public class StringValue extends Value {
 
 	@Override
 	public int getSize() {
-		return value.length()*2+4;
+		return value.length()*2;
 	}
 
-	@Override
-	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException {
-		buffer.putInt(value.length());
-		int pos=buffer.position();
-		for (int i = 0; i < value.length(); i++) {
-			buffer.putChar(value.charAt(i));
-		}
-		buffer.flip();
-		buffer.position(pos);
-		channel.write(buffer);
-		buffer.limit(buffer.capacity());
-		return buffer;
-	}
 
-	@Override
-	public boolean writeObject(ByteBuffer buffer) throws IOException {
-		if(buffer.position()+getSize()>=buffer.capacity())
-			return false;
-		buffer.putInt(value.length());
-		for (int i = 0; i < value.length(); i++) {
-			buffer.putChar(value.charAt(i));
-		}
-		return true;
-	}
-
-	@Override
-	public Value readObject(ByteBuffer buffer, int offset) throws IOException {
-		int size = buffer.getInt(offset);
-		int len=4;
-		StringBuffer sb=new StringBuffer();
-		for (int i = 0; i < size; i++) {
-			sb.append(buffer.getChar(offset+len));
-			len+=2;
-		}
-		this.value=sb.toString();
-		return this;
+	public String getValue() {
+		return value;
 	}
 
 	@Override
 	public void setDefault() {
 		this.value="";
+	}
+
+	@Override
+	public int getRealSize() {
+		return 2*value.length()+4;
 	}
 
 	@Override

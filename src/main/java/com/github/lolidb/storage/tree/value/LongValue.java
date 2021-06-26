@@ -19,9 +19,7 @@ package com.github.lolidb.storage.tree.value;
 
 import com.github.lolidb.storage.tree.Value;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -55,39 +53,24 @@ public class LongValue extends Value {
 		return value.compareTo(((LongValue) other).value)<0;
 	}
 
+
+	public Long getValue() {
+		return value;
+	}
+
 	@Override
 	public int getSize() {
 		return 8;
 	}
 
 	@Override
-	public ByteBuffer writeObject(ByteBuffer buffer,FileChannel channel) throws IOException {
-		int pos=buffer.position();
-		buffer.putLong(value);
-		buffer.flip();
-		buffer.position(pos);
-		channel.write(buffer);
-		buffer.limit(buffer.capacity());
-		return buffer;
-	}
-
-	@Override
-	public boolean writeObject(ByteBuffer buffer) throws IOException {
-		if(buffer.position()+getSize()>=buffer.capacity())
-			return false;
-		buffer.putLong(value);
-		return true;
-	}
-
-	@Override
-	public Value readObject(ByteBuffer buffer,int offset) throws IOException {
-		this.value=buffer.getLong(offset);
-		return this;
-	}
-
-	@Override
 	public void setDefault() {
 		this.value=0L;
+	}
+
+	@Override
+	public int getRealSize() {
+		return 8;
 	}
 
 	@Override
