@@ -95,6 +95,10 @@ public class BitMap {
 		return (tmp & cmp)!=0;
 	}
 
+	public int size(){
+		return bits.length;
+	}
+
 	/**
 	 * Unset given value, only called when this value exists.
 	 * @param code target value
@@ -113,22 +117,28 @@ public class BitMap {
 		}
 	}
 
-	public ByteBuffer writeObject(ByteBuffer buffer, FileChannel channel) throws IOException {
-		writeObject(buffer);
+	public static boolean writeObject(BitMap bitMap,ByteBuffer buffer, FileChannel channel) throws IOException {
+		if(!writeObject(bitMap,buffer)){
+			return false;
+		}
 		buffer.flip();
 		channel.write(buffer);
 		buffer.limit(buffer.capacity());
-		return buffer;
+		return true;
 	}
 
-	public void writeObject(ByteBuffer buffer){
-		buffer.putInt(bits.length);
-		for (int i = 0; i < bits.length; i++) {
-			buffer.put(bits[i]);
+	public static boolean writeObject(BitMap bitMap,ByteBuffer buffer){
+		if(4+bitMap.bits.length+buffer.position()>=buffer.capacity()){
+			return false;
 		}
+		buffer.putInt(bitMap.bits.length);
+		for (int i = 0; i < bitMap.bits.length; i++) {
+			buffer.put(bitMap.bits[i]);
+		}
+		return true;
 	}
 
-	public BitMap readObject(ByteBuffer buffer,int offset){
+	public static BitMap readObject(ByteBuffer buffer,int offset){
 		int length = buffer.getInt(offset);
 		BitMap map = new BitMap(length * 8);
 		for (int i = 0; i < map.bits.length; i++) {
@@ -165,5 +175,15 @@ public class BitMap {
 			buffer.append(" ");
 		}
 		return buffer.deleteCharAt(buffer.length()-1).toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof BitMap))
+			return false;
+
+		if(((BitMap) obj).size()!=size())
+			return false;
+		return new String(bits).hashCode()==new String(((BitMap) obj).bits).hashCode();
 	}
 }
