@@ -143,7 +143,7 @@ public class BufferTest {
 
 
 		for (int i = 0; i < values.length; i++) {
-			values[i].writeObject(buffer);
+//			values[i].writeObject(buffer);
 		}
 
 		for (int i = 0; i < values.length; i++) {
