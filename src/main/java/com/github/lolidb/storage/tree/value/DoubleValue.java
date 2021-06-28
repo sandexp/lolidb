@@ -17,6 +17,7 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
 
 import java.io.FileOutputStream;
@@ -84,5 +85,17 @@ public class DoubleValue extends Value {
 	@Override
 	public String toString() {
 		return "DoubleValue: "+value.toString();
+	}
+
+	public static DoubleValue parse(Object obj){
+		if (obj instanceof DoubleValue)
+			return (DoubleValue) obj;
+		if (obj instanceof Double)
+			return valueOf((Double) obj);
+		throw  new IllegalFormatException(String.format("Illegal format:%s for double value",obj.getClass().getName()));
+	}
+
+	private static DoubleValue valueOf(double b){
+		return new DoubleValue(b);
 	}
 }

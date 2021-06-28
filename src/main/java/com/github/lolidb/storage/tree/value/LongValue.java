@@ -17,6 +17,7 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
 
 import java.io.IOException;
@@ -83,5 +84,18 @@ public class LongValue extends Value {
 	@Override
 	public String toString() {
 		return "LongValue: "+value.toString();
+	}
+
+	public static LongValue parse(Object obj){
+		if (obj instanceof LongValue)
+			return (LongValue) obj;
+
+		if (obj instanceof Long)
+			return valueOf((Long) obj);
+		throw  new IllegalFormatException(String.format("Illegal format:%s for long value",obj.getClass().getName()));
+	}
+
+	private static LongValue valueOf(long l){
+		return new LongValue(l);
 	}
 }

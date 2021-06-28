@@ -17,7 +17,9 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -84,4 +86,21 @@ public class BooleanValue extends Value {
 		return "BooleanValue: "+value.toString();
 	}
 
+	public static BooleanValue parse(Object obj){
+		if (obj instanceof BooleanValue)
+			return (BooleanValue) obj;
+		if (obj instanceof Boolean)
+			return valueOf((Boolean) obj);
+		if(obj instanceof Integer)
+			return valueOf((Integer) obj);
+		throw  new IllegalFormatException(String.format("Illegal format:%s for boolean value",obj.getClass().getName()));
+	}
+
+	private static BooleanValue valueOf(boolean b){
+		return new BooleanValue(b);
+	}
+
+	private static BooleanValue valueOf(int b){
+		return new BooleanValue(b!=0);
+	}
 }

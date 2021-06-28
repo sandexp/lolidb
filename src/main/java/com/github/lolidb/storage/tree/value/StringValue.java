@@ -1,5 +1,6 @@
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
 
 import java.io.IOException;
@@ -63,5 +64,17 @@ public class StringValue extends Value {
 	@Override
 	public String toString() {
 		return "StringValue: "+value.toString();
+	}
+
+	public static StringValue parse(Object obj){
+		if(obj instanceof StringValue)
+			return (StringValue) obj;
+		if (obj instanceof String)
+			return valueOf((String) obj);
+		throw  new IllegalFormatException(String.format("Illegal format:%s for string value",obj.getClass().getName()));
+	}
+
+	private static StringValue valueOf(String s){
+		return new StringValue(s);
 	}
 }

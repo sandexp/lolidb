@@ -17,6 +17,7 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
 
 import java.io.FileOutputStream;
@@ -85,5 +86,18 @@ public class ShortValue extends Value {
 	@Override
 	public String toString() {
 		return "ShortValue: "+value.toString();
+	}
+
+	public static ShortValue parse(Object obj){
+		if(obj instanceof ShortValue)
+			return (ShortValue) obj;
+
+		if (obj instanceof Short)
+			return valueOf((Short) obj);
+		throw  new IllegalFormatException(String.format("Illegal format:%s for short value",obj.getClass().getName()));
+	}
+
+	private static ShortValue valueOf(short s){
+		return new ShortValue(s);
 	}
 }

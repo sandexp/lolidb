@@ -17,6 +17,7 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
 
 import java.io.FileOutputStream;
@@ -85,5 +86,19 @@ public class FloatValue extends Value {
 	@Override
 	public String toString() {
 		return "FloatValue: "+value.toString();
+	}
+
+	public static FloatValue parse(Object obj){
+		if (obj instanceof FloatValue)
+			return (FloatValue) obj;
+
+		if (obj instanceof Float)
+			return valueOf((Float) obj);
+		throw  new IllegalFormatException(String.format("Illegal format:%s for float value",obj.getClass().getName()));
+	}
+
+
+	private static FloatValue valueOf(float f){
+		return new FloatValue(f);
 	}
 }

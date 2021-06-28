@@ -115,6 +115,7 @@ public abstract class Value implements Cloneable, Serializable {
 	/**
 	 * Read {@link Value} from buffer. This buffer need to be ensured to have enough space.
 	 * And this method can only deserialize simple {@link Value}.
+	 * This method do not contains {@link StructValue}.
 	 * @param buffer nio buffer
 	 * @param klass target class
 	 * @return de-serialized {@link Value}

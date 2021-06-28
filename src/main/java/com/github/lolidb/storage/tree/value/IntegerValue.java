@@ -17,6 +17,7 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
 
 import java.io.FileOutputStream;
@@ -89,4 +90,16 @@ public class IntegerValue extends Value {
 		return "IntegerValue: "+value.toString();
 	}
 
+	public static IntegerValue parse(Object obj){
+		if (obj instanceof IntegerValue)
+			return (IntegerValue) obj;
+
+		if (obj instanceof Integer)
+			return valueOf((Integer) obj);
+		throw  new IllegalFormatException(String.format("Illegal format:%s for int value",obj.getClass().getName()));
+	}
+
+	private static IntegerValue valueOf(int i){
+		return new IntegerValue(i);
+	}
 }

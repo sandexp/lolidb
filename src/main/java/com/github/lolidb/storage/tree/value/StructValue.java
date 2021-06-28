@@ -17,8 +17,11 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.catalyst.catalog.ColumnDescription;
+import com.github.lolidb.catalyst.catalog.Schema;
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
-import com.github.lolidb.utils.collections.BitMap;
+import com.github.lolidb.utils.collections.Tuple;
 
 import java.util.*;
 
@@ -136,6 +139,98 @@ public class StructValue extends Value {
 		for (Value field : value.fields) {
 			fields.add(field);
 		}
+	}
+
+	public static StructValue parse(Schema schema, Tuple tuple){
+		List<ColumnDescription> cols = schema.getValues();
+		StructValue value=new StructValue();
+		if(tuple.size()!=cols.size()){
+			throw new IllegalFormatException("Tuple value can not match with schema: "+schema);
+		}
+
+		for (int i = 0; i < cols.size(); i++) {
+			Value val = null;
+			Class klass=cols.get(i).getType();
+
+			if(klass==ByteValue.class){
+
+				val=ByteValue.parse(tuple.get(i));
+			}else if(klass==BooleanValue.class){
+
+				val=BooleanValue.parse(tuple.get(i));
+			}else if(klass==CharacterValue.class){
+
+				val=CharacterValue.parse(tuple.get(i));
+			}else if(klass==ShortValue.class){
+
+				val=ShortValue.parse(tuple.get(i));
+			}else if(klass==IntegerValue.class){
+
+				val=IntegerValue.parse(tuple.get(i));
+			}else if(klass==FloatValue.class){
+
+				val=FloatValue.parse(tuple.get(i));
+			}else if(klass==DoubleValue.class){
+
+				val=DoubleValue.parse(tuple.get(i));
+			}else if(klass==StringValue.class){
+
+				val=StringValue.parse(tuple.get(i));
+			}else if(klass==LongValue.class){
+
+				val=LongValue.parse(tuple.get(i));
+			}
+			value.addField(val);
+		}
+
+		return value;
+	}
+
+	public static StructValue parse(Schema schema,List<Object> fields){
+		StructValue value=new StructValue();
+
+		List<ColumnDescription> cols = schema.getValues();
+
+		if(fields.size()!=cols.size()){
+			throw new IllegalFormatException("Struct value can not match with schema: "+schema);
+		}
+
+		for (int i = 0; i < cols.size(); i++) {
+
+			Class klass=cols.get(i).getType();
+			Value val = null;
+			if(klass==ByteValue.class){
+
+				val=ByteValue.parse(fields.get(i));
+			}else if(klass==BooleanValue.class){
+
+				val=BooleanValue.parse(fields.get(i));
+			}else if(klass==CharacterValue.class){
+
+				val=CharacterValue.parse(fields.get(i));
+			}else if(klass==ShortValue.class){
+
+				val=ShortValue.parse(fields.get(i));
+			}else if(klass==IntegerValue.class){
+
+				val=IntegerValue.parse(fields.get(i));
+			}else if(klass==FloatValue.class){
+
+				val=FloatValue.parse(fields.get(i));
+			}else if(klass==DoubleValue.class){
+
+				val=DoubleValue.parse(fields.get(i));
+			}else if(klass==LongValue.class){
+
+				val=LongValue.parse(fields.get(i));
+			}else if(klass==StringValue.class){
+
+				val=StringValue.parse(fields.get(i));
+			}
+			value.addField(val);
+		}
+
+		return value;
 	}
 
 }

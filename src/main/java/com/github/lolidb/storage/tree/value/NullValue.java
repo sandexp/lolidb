@@ -17,6 +17,7 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
 
 import java.io.IOException;
@@ -78,5 +79,18 @@ public class NullValue extends Value {
 	@Override
 	public String toString() {
 		return "NullValue";
+	}
+
+	public static NullValue parse(Object obj){
+		if (obj == null)
+			return valueOf();
+
+		if(obj instanceof NullValue)
+			return (NullValue) obj;
+		throw  new IllegalFormatException(String.format("Illegal format:%s for null value",obj.getClass().getName()));
+	}
+
+	private static NullValue valueOf(){
+		return new NullValue();
 	}
 }

@@ -17,6 +17,7 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
 
 import java.io.*;
@@ -87,5 +88,18 @@ public class ByteValue extends Value {
 	@Override
 	public String toString() {
 		return "ByteValue: "+ value.toString();
+	}
+
+	public static ByteValue parse(Object obj){
+		if (obj instanceof ByteValue)
+			return (ByteValue) obj;
+		if (obj instanceof Byte)
+			return valueOf((Byte) obj);
+		throw  new IllegalFormatException(String.format("Illegal format:%s for byte value",obj.getClass().getName()));
+	}
+
+	private static ByteValue valueOf(byte b){
+		ByteValue val = new ByteValue(b);
+		return val;
 	}
 }

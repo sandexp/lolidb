@@ -17,6 +17,7 @@
 
 package com.github.lolidb.storage.tree.value;
 
+import com.github.lolidb.exception.IllegalFormatException;
 import com.github.lolidb.storage.tree.Value;
 
 import java.io.FileOutputStream;
@@ -88,5 +89,17 @@ public class CharacterValue extends Value {
 	@Override
 	public String toString() {
 		return "CharacterValue: "+value.toString();
+	}
+
+	public static CharacterValue parse(Object obj){
+		if (obj instanceof CharacterValue)
+			return (CharacterValue) obj;
+		if (obj instanceof Character)
+			return valueOf((Character) obj);
+		throw  new IllegalFormatException(String.format("Illegal format:%s for character value",obj.getClass().getName()));
+	}
+
+	private static CharacterValue valueOf(char c){
+		return new CharacterValue(c);
 	}
 }
