@@ -46,7 +46,7 @@ public class BitMapTest {
 		map.set(7);
 		map.set(13);
 		ByteBuffer buffer=ByteBuffer.allocate(64);
-		map.writeObject(buffer);
+		BitMap.writeObject(map,buffer);
 		BitMap map1=map.readObject(buffer,0);
 		System.out.println(map1);
 		System.out.println(map1.toBinaryString());
@@ -55,6 +55,22 @@ public class BitMapTest {
 		System.out.println(map1.contains(13));
 		System.out.println(map1.contains(5));
 		System.out.println(map1.contains(3));
+	}
+
+	@DisplayName("Test whether two bitmap are same.")
+	@Test
+	public void testEqual(){
+		BitMap map = new BitMap(16);
+		map.set(5);
+		map.set(7);
+		map.set(13);
+
+		BitMap map1 = new BitMap(16);
+		map1.set(5);
+		map1.set(7);
+		map1.set(13);
+
+		System.out.println(map.equals(map1));
 	}
 
 }
