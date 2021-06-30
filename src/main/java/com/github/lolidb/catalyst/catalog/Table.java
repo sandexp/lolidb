@@ -17,12 +17,12 @@
 package com.github.lolidb.catalyst.catalog;
 
 import com.github.lolidb.storage.Row;
-import com.github.lolidb.storage.tree.value.StructField;
 import com.github.lolidb.storage.tree.value.StructValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
@@ -48,11 +48,9 @@ public abstract class Table {
 
 	protected File location;
 
-	// when true, this table is a temporary table
-	protected boolean isTemporary;
+	protected TableType type;
 
-	// when true, this table is a view
-	protected boolean isView;
+	protected boolean isAvailable;
 
 	// store create time of this table
 	protected long createdTimestamp;
@@ -60,20 +58,20 @@ public abstract class Table {
 	// store the last visit of this table
 	protected long lastAccessTimestamp;
 
-	public Table(String tableName,File location,StructValue schema,boolean isTemporary,boolean isView){
+	public Table(String tableName,File location,StructValue schema,TableType type){
 		this.tableName=tableName;
 		this.schema=schema;
 		this.partitions=new HashMap<>();
 		this.partitions.put(null,new Partition(tableName));
-		this.isTemporary=isTemporary;
 		this.location=location;
-		this.isView=isView;
 		this.createdTimestamp=new Date().getTime();
 		this.lastAccessTimestamp=createdTimestamp;
+		this.type=type;
+		this.isAvailable=false;
 	}
 
 	public Table(String tableName,File location,StructValue schema){
-		this(tableName,location,schema,false,false);
+		this(tableName,location,schema,TableType.PHYSICAL_TABLE);
 	}
 
 	/**
@@ -90,7 +88,7 @@ public abstract class Table {
 		// when the first partition enter, break default partition
 		if(partitions.containsKey(null)
 			&& partitions.size()==1){
-			if(partitions.get(null).blockIds.size()!=0){
+			if(partitions.get(null).pages.size()!=0){
 				throw new UnsupportedOperationException("You can not add new partition when not assigning partition field.");
 			}
 			partitions.remove(null);
@@ -104,29 +102,21 @@ public abstract class Table {
 	}
 
 	/**
-	 * TODO Add a column to schema.
-	 * @param column pending column
-	 */
-	public void addColumn(StructField column){
-		schema.addField(column);
-	}
-
-	/**
 	 * Open tablespace.
 	 * When this table is physical table, this method will load all partition from
-	 * {@link com.github.lolidb.storage.BlockId} list. If the database restart, the disk
+	 * {@link com.github.lolidb.storage.Page} list. If the database restart, the disk
 	 * manager store no information, we will recover from log to a new disk manager.
 	 *
 	 * Temporary table do not need to recover from log, other steps are same as physical table.
 	 *
-	 * When this table type is view, it will not allocate {@link com.github.lolidb.storage.BlockId}
+	 * When this table type is view, it will not allocate {@link com.github.lolidb.storage.Page}
 	 * to this table but only memory content to it.
 	 */
 	public abstract void open();
 
 	/**
 	 * When table is a temporary table, the caller invoke this method, this method
-	 * will recycle the memory of temporary table and remove the {@link com.github.lolidb.storage.BlockId}
+	 * will recycle the memory of temporary table and remove the {@link com.github.lolidb.storage.Page}
 	 * in block manager, and free space from buffer pool.
 	 */
 	public abstract void close();
@@ -170,6 +160,14 @@ public abstract class Table {
 	 * @param record search target
 	 */
 	public abstract void get(Row record);
+
+
+	/**
+	 * Scan a partition and put data into buffer as return value.
+	 * @param partition target partition
+	 * @return result buffer, may be several pages, and one {@link ByteBuffer} represent one {@link com.github.lolidb.storage.Page}
+	 */
+	public abstract ByteBuffer[] scan(Partition partition);
 
 	@Override
 	public String toString() {

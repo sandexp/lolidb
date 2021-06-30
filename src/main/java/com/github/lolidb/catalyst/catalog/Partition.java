@@ -18,27 +18,40 @@
 package com.github.lolidb.catalyst.catalog;
 
 
-import com.github.lolidb.storage.BlockId;
+import com.github.lolidb.storage.Page;
+import com.github.lolidb.storage.Row;
 
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * Storage as a sub-part of a tablespace. It will contains several data blocks.
+ * Each partition has one disk manager to operation record.
  */
 public class Partition {
+
+	// partition first address, every block start at address+(n-1)*blockSize
+	protected long address;
 
 	// partition name
 	protected String name;
 
+	// each partition has its channel
+	protected FileChannel channel;
 
-	// blocks inside partition
-	protected List<BlockId> blockIds;
+	/** blocks inside partition, we will write the page one by one
+		when the last page has not enough space to hold a record, we will switch to next page,
+	    when {@link com.github.lolidb.storage.MemoryBlockCache} is full, we we force the evicted {@link Page}
+	    to spill to disk, and keep page description in tablespace for next call.
+	 */
+	protected List<Page> pages;
 
 	public Partition(String name){
 		this.name=name;
-		this.blockIds=new ArrayList<>();
+		this.pages=new ArrayList<>();
 	}
 
 	public Partition(){
@@ -49,12 +62,25 @@ public class Partition {
 		return name;
 	}
 
-	public void addBlock(BlockId blockId){
-		blockIds.add(blockId);
+	public void addBlock(Page page){
+		pages.add(page);
 	}
 
 	public void reset(){
-		this.blockIds.clear();
+		this.pages.clear();
+	}
+
+	public void add(Row record){
+
+	}
+
+	public void remove(Row record){
+
+	}
+
+	public ByteBuffer[] scan(){
+
+		return null;
 	}
 
 	@Override
