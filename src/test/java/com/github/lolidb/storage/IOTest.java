@@ -97,7 +97,7 @@ public class IOTest {
 		String data2="this is a comment.";
 
 		System.out.println("Before "+channel.position());
-		ByteBuffer buffer = ByteBuffer.allocate(128);
+		ByteBuffer buffer = ByteBuffer.allocateDirect(128);
 		buffer.clear();
 		buffer.put(data.getBytes());
 		buffer.flip();
