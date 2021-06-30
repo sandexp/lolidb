@@ -39,7 +39,7 @@ public class BitMap {
 	}
 
 	public BitMap(){
-		this(1024);
+		this(256);
 	}
 
 	/**
@@ -97,6 +97,10 @@ public class BitMap {
 
 	public int size(){
 		return bits.length;
+	}
+
+	public int getRealSize(){
+		return bits.length+4;
 	}
 
 	/**
