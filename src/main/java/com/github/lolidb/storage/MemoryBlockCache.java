@@ -22,86 +22,98 @@ import com.github.lolidb.utils.Configuration;
 import java.util.*;
 
 /**
- * Memory pool contains several pages(DataBlock).
+ * Memory pool contains several pages(Page).
  * Firstly, memory pool is empty, and new page will be inserted into pool.
  * When the pool is full, we will use lru algorithm to drop a page (maybe need to be written to disk.)
- *
- * 
  */
 public class MemoryBlockCache {
 
-	// pages table
-	private List<DataBlock> pages=new ArrayList<>();
+	private int size;
 
-	private Map<BlockId,Integer> index=new HashMap<>();
+	// pages table
+	private List<Page> pages=new ArrayList<>();
+
+	private Map<Page,Integer> index=new HashMap<>();
+
+	public MemoryBlockCache(int size){
+		this.size=size;
+	}
+
+	public MemoryBlockCache(){
+		this.size=Configuration.DEFAULT_MEMORY_POOL_SIZE;
+	}
 
 	/**
 	 * Add a page to this memory page
-	 * @param block new page
+	 * @param page new page
 	 */
-	public void add(DataBlock block){
-		if(pages.size()>=Configuration.DEFAULT_MEMORY_POOL_SIZE){
+	public void add(Page page){
+		if(pages.size()>=size){
 			// use lru algorithm to replace one
-			DataBlock removal = pages.get(pages.size() - 1);
+			Page removal = pages.get(pages.size() - 1);
 
 			// update index
-			index.remove(removal.blockId);
+			index.remove(removal);
 			// if this page has updated, here will persist it to disk
-			if(block.isModified){
+			if(page.isModified){
 				// todo use suitable persist method to write to disk
-				block.persist();
+
 			}
 		}
 
-		if(!index.containsKey(block.blockId)){
-			pages.add(block);
+		if(!index.containsKey(page)){
+			pages.add(page);
 			// size-1 will be the new index, update index
-			index.put(block.blockId,pages.size()-1);
+			index.put(page,pages.size()-1);
 		}else {
-			visit(block.blockId);
+			visit(page);
 		}
 	}
 
 	/**
 	 * Visit assign block, here this block will be retrieved in page table.
 	 * When there is not such block in page table, return null.
-	 * @param blockId block identifier
+	 * @param page block identifier
 	 * @return data block in cache
 	 */
-	public DataBlock visit(BlockId blockId){
+	public Page visit(Page page){
 
-		if(!index.containsKey(blockId)){
+		if(!index.containsKey(page)){
 			return null;
 		}else {
-			int pos=index.get(blockId);
+			int pos=index.get(page);
 			for (int i = pos; i >0 ; i--) {
 				if(pages.get(pos).lifes>=pages.get(pos-1).lifes){
 					// this index i will be new index, update it
-					index.put(blockId,i);
+					index.put(page,i);
 					break;
 				}
-				DataBlock tmp=pages.get(pos);
+				Page tmp=pages.get(pos);
 				pages.set(pos,pages.get(pos-1));
 				pages.set(pos-1,tmp);
 			}
 			
 			// update index
 			for (int i = 0; i < pos; i++) {
-				index.put(pages.get(i).blockId,i);
+				index.put(page,i);
 			}
 		}
 		return null;
 	}
 
 	/**
-	 * Free block of given blockId and remove it from search table and page table.
-	 * @param blockId
+	 * Free block of given page and remove it from search table and page table.
+	 * Before remove from mem-pool, it need to be spilled to disk and write a description
+	 * copy to wal.
+	 * @param page pending page
 	 */
-	public void free(BlockId blockId){
-		if(!index.containsKey(blockId));
-		int pos = index.get(blockId);
+	public void free(Page page){
+		if(!index.containsKey(page)){
+			return;
+		}
+		int pos = index.get(page);
 		pages.remove(pos);
-		index.remove(blockId);
+		index.remove(page);
 	}
 
 }

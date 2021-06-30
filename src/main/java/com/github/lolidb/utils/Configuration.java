@@ -28,9 +28,15 @@ public class Configuration {
 
 	public static final String MAX_BLOCK_NUMBERS="max.block.numbers";
 
+	public static final String STORAGE_ROOT_DIR="storage.root.dir";
+
+	public static final String USE_LOG_MANAGER="use.log.manager";
+
 	///////////////////////////////////////////////////////////////////////////
 	// default value
 	///////////////////////////////////////////////////////////////////////////
+
+	public static final boolean DEFAULT_USE_LOG_MANAGER=true;
 
 	public static final int FREELIST_DEFAULT_SIZE=64;
 
@@ -51,4 +57,7 @@ public class Configuration {
 
 	// in lolidb, a table can contain at most 2^31 pages
 	public static final int PAGES_BITS_IN_A_TABLE=19;
+
+	// the root dir of data
+	public static final String DEFAULT_STORAGE_ROOT_DIR="E:/data/";
 }
