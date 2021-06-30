@@ -96,6 +96,7 @@ public abstract class Value implements Cloneable, Serializable {
 			buffer.putInt(val?1:0);
 		}else if(klass==StringValue.class){
 			String s = (String) value.getValue();
+			int pos=buffer.position();
 			buffer.putInt(s.length());
 			for (int i = 0; i < s.length(); i++) {
 				buffer.putChar(s.charAt(i));
@@ -195,6 +196,8 @@ public abstract class Value implements Cloneable, Serializable {
 	public abstract int getRealSize();
 
 	public abstract Object getValue();
+
+	public abstract boolean equals(Object obj);
 
 }
 

@@ -52,6 +52,13 @@ public class StringValue extends Value {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof StringValue))
+			return false;
+		return value.equals(((StringValue) obj).value);
+	}
+
+	@Override
 	public void setDefault() {
 		this.value="";
 	}

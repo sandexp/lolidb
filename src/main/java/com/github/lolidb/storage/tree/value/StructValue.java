@@ -50,13 +50,11 @@ public class StructValue extends Value {
 		if(!(obj instanceof StructValue)){
 			return false;
 		}
-
 		if(fields.size()!=((StructValue) obj).fields.size()){
 			return false;
 		}
-
-		for (Value field:fields) {
-			if(fields.contains(field)){
+		for (int i = 0; i < fields.size(); i++) {
+			if(!fields.get(i).equals(((StructValue) obj).fields.get(i))){
 				return false;
 			}
 		}
