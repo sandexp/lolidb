@@ -224,6 +224,22 @@ public class Row implements Serializable {
 		return data.equals(((Row) obj).data);
 	}
 
+	/**
+	 * Judge two record if two value is same
+	 * @param obj other record
+	 * @return whether is same
+	 */
+	public boolean sameAs(Object obj){
+		if(!(obj instanceof Row))
+			return false;
+		if(isDeleted!=((Row) obj).isDeleted)
+			return false;
+		if(!bitMap.equals(((Row) obj).bitMap))
+			return false;
+		return data.equals(((Row) obj).data);
+
+	}
+
 	@Override
 	public String toString() {
 		return data.toString();
