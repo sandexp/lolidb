@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 
 package com.github.lolidb.storage;
 
@@ -40,7 +40,7 @@ import java.nio.channels.FileChannel;
 @DisplayName("Test page basic operation.")
 public class PageTest {
 
-	private Page page=new Page();
+	private Page page=new Page(0);
 
 	private static String filePath="E:/data/page.txt";
 
@@ -81,15 +81,14 @@ public class PageTest {
 			.addColumn(new ColumnDescription("sex","",BooleanValue.class));
 		Row row = new Row(StructValue.parse(schema,new Tuple3<>(new StringValue("mark"),new IntegerValue(18),new BooleanValue(true))));
 
-		for (int i = 0; i < 110; i++) {
-			page.addRecord(row);
-		}
-
 		File file=new File(filePath);
 		FileOutputStream fos = new FileOutputStream(file);
 		FileChannel writeChannel = fos.getChannel();
 		FileInputStream fis=new FileInputStream(file);
 		FileChannel readChannel = fis.getChannel();
+		for (int i = 0; i < 110; i++) {
+			page.addRecord(row);
+		}
 
 		System.out.println(page.buffer);
 

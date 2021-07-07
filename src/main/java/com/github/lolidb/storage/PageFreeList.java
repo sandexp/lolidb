@@ -19,11 +19,16 @@ package com.github.lolidb.storage;
 
 import com.github.lolidb.storage.tree.FreeList;
 import com.github.lolidb.utils.Configuration;
+import com.github.lolidb.utils.ConfigureReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PageFreeList {
 	private static final Logger logger= LoggerFactory.getLogger(FreeList.class);
+
+	private static ConfigureReader reader=ConfigureReader.getInstance();
+
+	private static int PAGE_SIZE=reader.get(Configuration.PAGE_SIZE_BYTES,Configuration.DEFAULT_PAGE_SIZE_BYTES);
 
 	protected Object lock=new Object();
 
@@ -38,7 +43,7 @@ public class PageFreeList {
 	public PageFreeList(int size){
 		freeList=new Page[size];
 		for (int i = 0; i < freeList.length; i++) {
-			freeList[i]=new Page();
+			freeList[i]=new Page(i*PAGE_SIZE);
 		}
 		cursor=size-1;
 	}
@@ -50,7 +55,7 @@ public class PageFreeList {
 		int size= Configuration.FREELIST_DEFAULT_SIZE;
 		freeList=new Page[size];
 		for (int i = 0; i < freeList.length; i++) {
-			freeList[i]=new Page();
+			freeList[i]=new Page(i*PAGE_SIZE);
 		}
 		cursor=size-1;
 	}
@@ -73,7 +78,9 @@ public class PageFreeList {
 	public boolean recycle(){
 		if(cursor+1>=freeList.length)
 			return false;
-		freeList[++cursor]=new Page();
+
+		freeList[cursor+1]=new Page(cursor*PAGE_SIZE);
+		cursor++;
 		return true;
 	}
 }

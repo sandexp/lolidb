@@ -74,14 +74,14 @@ public class Page implements Comparable{
 	///////////////////////////////////////////////////////////////////////////
 	// Constructor
 	///////////////////////////////////////////////////////////////////////////
-	public Page(int capacity){
+	public Page(long address,int capacity){
+		this.address=address;
 		buffer=ByteBuffer.allocateDirect(capacity);
 	}
 
-	public Page(){
-		buffer=ByteBuffer.allocateDirect(8192);
+	public Page(long address){
+		this(address,8192);
 	}
-
 
 	///////////////////////////////////////////////////////////////////////////
 	// underlying API
@@ -111,7 +111,9 @@ public class Page implements Comparable{
 	 * @return true if add successfully
 	 */
 	public boolean addRecord(Row record) throws IOException {
-		assert !record.isDeleted();
+		if(record.isDeleted()){
+			return false;
+		}
 		if(realUsedMemory+record.getRealSize()<=buffer.capacity()){
 			Row.writeObject(record,buffer);
 			// only contains value size
@@ -244,4 +246,10 @@ public class Page implements Comparable{
 		return this.lifes-((Page) o).lifes;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Page))
+			return false;
+		return address==((Page) obj).address;
+	}
 }
