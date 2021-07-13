@@ -18,10 +18,12 @@
 package com.github.lolidb.storage;
 
 import com.github.lolidb.catalyst.catalog.Schema;
+import com.github.lolidb.utils.Configuration;
+import com.github.lolidb.utils.ConfigureReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -38,8 +40,17 @@ public class Page implements Comparable{
 
 	private static final Logger logger= LoggerFactory.getLogger(Page.class);
 
+	private static final ConfigureReader reader=ConfigureReader.getInstance();
+
 	// global unique identifier
 	protected long address;
+
+
+	// table name
+	protected String tableName;
+
+	// partition name
+	protected String partitionName;
 
 	/**
 	 * used memory of current block
@@ -71,15 +82,39 @@ public class Page implements Comparable{
 
 	protected ByteBuffer buffer;
 
+
+	protected FileChannel channel;
+
 	///////////////////////////////////////////////////////////////////////////
 	// Constructor
 	///////////////////////////////////////////////////////////////////////////
-	public Page(long address,int capacity){
+	public Page(long address,int capacity,String tableName,String partitionName) throws IOException {
+		this.partitionName=partitionName;
+		this.tableName=tableName;
 		this.address=address;
 		buffer=ByteBuffer.allocateDirect(capacity);
+		String rootDir=reader.get(Configuration.STORAGE_ROOT_DIR,Configuration.DEFAULT_STORAGE_ROOT_DIR);
+		File tableFilePath = new File(rootDir + tableName);
+		if(!tableFilePath.exists()){
+			tableFilePath.mkdir();
+		}
+		File filePath=new File(rootDir+tableName+"/"+partitionName+".llb");
+
+		if(!filePath.exists()){
+			filePath.createNewFile();
+		}
+		channel=new RandomAccessFile(filePath.getName(),"rw").getChannel();
 	}
 
-	public Page(long address){
+	public Page(long address,int capacity,String tableName) throws IOException {
+		this(address,capacity,tableName,"default");
+	}
+
+	public Page(long address,int capacity) throws IOException {
+		this(address,capacity,"default","default");
+	}
+
+	public Page(long address) throws IOException {
 		this(address,8192);
 	}
 
@@ -87,6 +122,14 @@ public class Page implements Comparable{
 	// underlying API
 	///////////////////////////////////////////////////////////////////////////
 
+
+	public void setPartitionName(String partitionName) {
+		this.partitionName = partitionName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
 
 	public Page setFileOffset(long fileOffset) {
 		this.fileOffset = fileOffset;
@@ -171,7 +214,6 @@ public class Page implements Comparable{
 		return false;
 	}
 
-
 	/**
 	 * Search given <code>record</code> in this page. Return the <code>row</code> whose value is same to this <code>record</code>
 	 * @param record search value
@@ -199,10 +241,9 @@ public class Page implements Comparable{
 	 * Rest space in page can not hold any row, because here we have not support null
 	 * value, so just flip the buffer and write.
 	 * Called only when the rest space is not enough and it is evicted by lru algorithm.
-	 * @param channel file channel
 	 * @apiNote spilled page must be a dirty page,because new page have no data in it
 	 */
-	public void spill(FileChannel channel) throws IOException {
+	public void spill() throws IOException {
 		if(!isModified){
 			logger.warn("you can not spill new page into disk.");
 			return;
@@ -221,10 +262,9 @@ public class Page implements Comparable{
 
 	/**
 	 * Load buffer context from file channel to recover from disk.
-	 * @param channel file channel
 	 * @param fileOffset file offset
 	 */
-	public void load(FileChannel channel, long fileOffset,int pageSize,int buffSize) throws IOException {
+	public void load(long fileOffset,int pageSize,int buffSize) throws IOException {
 		if(buffer!=null){
 			logger.warn("Can not load data to dirty page with file channel:{}",channel);
 			return;
@@ -251,5 +291,10 @@ public class Page implements Comparable{
 		if(!(obj instanceof Page))
 			return false;
 		return address==((Page) obj).address;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("(%s,%s)",address,pageSize);
 	}
 }
