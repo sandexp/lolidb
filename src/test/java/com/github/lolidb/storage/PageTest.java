@@ -28,10 +28,7 @@ import com.github.lolidb.utils.collections.Tuple3;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.channels.FileChannel;
 
 /**
@@ -39,8 +36,6 @@ import java.nio.channels.FileChannel;
  */
 @DisplayName("Test page basic operation.")
 public class PageTest {
-
-	private Page page=new Page(0);
 
 	private static String filePath="E:/data/page.txt";
 
@@ -51,6 +46,7 @@ public class PageTest {
 	@DisplayName("Insert row function")
 	@Test
 	public void testInsertRow() throws IOException {
+		Page page=new Page(0);
 		Schema schema=new Schema()
 			.addColumn(new ColumnDescription("name","", StringValue.class))
 			.addColumn(new ColumnDescription("age","", IntegerValue.class))
@@ -75,6 +71,7 @@ public class PageTest {
 	@DisplayName("Test spill when this page is full.")
 	@Test
 	public void testSpillAndLoad() throws IOException {
+		Page page=new Page(0);
 		Schema schema=new Schema()
 			.addColumn(new ColumnDescription("name","", StringValue.class))
 			.addColumn(new ColumnDescription("age","", IntegerValue.class))
@@ -92,10 +89,10 @@ public class PageTest {
 
 		System.out.println(page.buffer);
 
-		page.spill(writeChannel);
+		page.spill();
 		System.out.println(page.buffer);
 
-		page.load(readChannel,page.fileOffset,page.pageSize,8192);
+		page.load(page.fileOffset,page.pageSize,8192);
 		System.out.println(page.buffer);
 
 		int pos=0,cnt=0;
@@ -110,6 +107,7 @@ public class PageTest {
 	@DisplayName("Test search a row in one page.")
 	@Test
 	public void testSearchFunction() throws IOException {
+		Page page=new Page(0);
 		Schema schema=new Schema()
 			.addColumn(new ColumnDescription("name","", StringValue.class))
 			.addColumn(new ColumnDescription("age","", IntegerValue.class))
