@@ -17,9 +17,10 @@
 
 package com.github.lolidb.catalyst.catalog;
 
-import com.github.lolidb.storage.tree.Value;
-
-import java.io.File;
+import javax.activation.UnsupportedDataTypeException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,7 @@ import java.util.List;
  * to locate {@link com.github.lolidb.storage.tree.value.NullValue}. It just give
  * a list of {@link com.github.lolidb.storage.tree.Value}.
  */
-public class Schema {
+public class Schema implements Serializable {
 
 	private List<ColumnDescription> values;
 
@@ -47,8 +48,52 @@ public class Schema {
 		return this;
 	}
 
+	public void allocate(int size) throws UnsupportedDataTypeException {
+		for (int i = 0; i < size; i++) {
+			this.values.add(new ColumnDescription(null,null,null));
+		}
+	}
+
+	public int size(){
+		return values.size();
+	}
+
 	public List<ColumnDescription> getValues() {
 		return values;
 	}
 
+
+	/**
+	 * Write schema info to channel.
+	 * @param channel file channel
+	 */
+	public void writeObject(FileChannel channel) throws IOException {
+		for (int i = 0; i < values.size(); i++) {
+			values.get(i).writeObject(channel);
+		}
+	}
+
+	/**
+	 * Read schema info from channel at given offset {@code pos} and given size {@code size}.
+	 * @param channel file channel
+	 * @param pos offset in channel
+	 * @param size col max size, default 8192
+	 * @throws IOException
+	 */
+	public void readObject(FileChannel channel,long pos,int size) throws IOException, ClassNotFoundException {
+		for (int i = 0; i < values.size(); i++) {
+			int nums = values.get(i).readObject(channel, pos, size);
+			pos+=nums;
+		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer buffer=new StringBuffer();
+		buffer.append("{");
+		for (int i = 0; i < values.size(); i++) {
+			buffer.append(values.get(i)).append(",");
+		}
+		return buffer.deleteCharAt(buffer.length()-1).append("}").toString();
+	}
 }
