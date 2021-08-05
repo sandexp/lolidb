@@ -20,6 +20,7 @@ package com.github.lolidb.catalyst.catalog;
 import javax.activation.UnsupportedDataTypeException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,12 +49,6 @@ public class Schema implements Serializable {
 		return this;
 	}
 
-	public void allocate(int size) throws UnsupportedDataTypeException {
-		for (int i = 0; i < size; i++) {
-			this.values.add(new ColumnDescription(null,null,null));
-		}
-	}
-
 	public int size(){
 		return values.size();
 	}
@@ -62,12 +57,31 @@ public class Schema implements Serializable {
 		return values;
 	}
 
+	public long length(){
+		int ans=4;
+		for (int i = 0; i < values.size(); i++) {
+			ans+=values.get(i).getName().length()*2;
+			ans+=values.get(i).getComment().length()*2;
+			ans+=values.get(i).getType().getName().length()*2;
+		}
+		return ans;
+	}
 
 	/**
-	 * Write schema info to channel.
+	 * Write schema info to channel. Written layout is as following:
+	 * {{{
+	 *     attribute numbers (4 bytes)
+	 *
+	 *     each column attribute(this will use {@link ColumnDescription} to calculate size).
+	 * }}}
+	 * this method will write 4+ sum(column size) to file channel.
 	 * @param channel file channel
 	 */
 	public void writeObject(FileChannel channel) throws IOException {
+		ByteBuffer buffer=ByteBuffer.allocateDirect(8192);
+		buffer.putInt(values.size());
+		buffer.flip();
+		channel.write(buffer);
 		for (int i = 0; i < values.size(); i++) {
 			values.get(i).writeObject(channel);
 		}
@@ -75,16 +89,38 @@ public class Schema implements Serializable {
 
 	/**
 	 * Read schema info from channel at given offset {@code pos} and given size {@code size}.
+	 * Reading order is as follow:
+	 * {{{
+	 *     Read first int as column numbers.
+	 *
+	 *     iterate by column numbers and deserialize schema info to {@link ColumnDescription}.
+	 *
+	 * }}}
+	 * @apiNote this method can at most read {@code Integer.MAX_VALUE} column desc info.
 	 * @param channel file channel
 	 * @param pos offset in channel
-	 * @param size col max size, default 8192
+	 * @param size col max size, default 8192 assure this size is enough
+	 * @return next iteration start seek pos
 	 * @throws IOException
 	 */
-	public void readObject(FileChannel channel,long pos,int size) throws IOException, ClassNotFoundException {
-		for (int i = 0; i < values.size(); i++) {
-			int nums = values.get(i).readObject(channel, pos, size);
-			pos+=nums;
+	public long readObject(FileChannel channel,long pos,int size) throws IOException, ClassNotFoundException {
+		long st=4;
+		ByteBuffer buffer=ByteBuffer.allocateDirect(size);
+		channel.read(buffer,pos);
+
+		int len=buffer.getInt(0);
+
+		pos+=4;
+		for (int i = 0; i < len; i++) {
+			ColumnDescription desc=new ColumnDescription(null,null,null);
+			pos= desc.readObject(channel, pos, size);
+			if(i<values.size()){
+				values.set(i,desc);
+			}else {
+				values.add(desc);
+			}
 		}
+		return pos;
 	}
 
 	@Override

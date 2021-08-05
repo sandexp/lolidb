@@ -22,7 +22,9 @@ import com.github.lolidb.storage.tree.Value;
 import com.github.lolidb.storage.tree.value.NullValue;
 
 import javax.activation.UnsupportedDataTypeException;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -64,11 +66,15 @@ public class ColumnDescription implements Cloneable{
 
 	/**
 	 * Serialize column description to {@link FileChannel}.
+	 * @apiNote the method of this method will calculate buff size to hold data info.
 	 * @param channel file channel
 	 * @throws IOException
 	 */
 	public int writeObject(FileChannel channel) throws IOException {
-		ByteBuffer buffer=ByteBuffer.allocateDirect(8192);
+		String klassName=type.getName();
+		int size=12+(name.length()+comment.length()+klassName.length())*2;
+		ByteBuffer buffer=ByteBuffer.allocateDirect(size);
+
 		buffer.putInt(name.length());
 		for (int i = 0; i < name.length(); i++) {
 			buffer.putChar(name.charAt(i));
@@ -79,7 +85,7 @@ public class ColumnDescription implements Cloneable{
 			buffer.putChar(comment.charAt(i));
 		}
 
-		String klassName=type.getName();
+
 		buffer.putInt(klassName.length());
 		for (int i = 0; i < klassName.length(); i++) {
 			buffer.putChar(klassName.charAt(i));
@@ -88,7 +94,7 @@ public class ColumnDescription implements Cloneable{
 		channel.write(buffer);
 		// detach link to buffer and notice gc to recycle
 		buffer=null;
-		return 12+(name.length()+comment.length()+klassName.length())*2;
+		return size;
 	}
 
 
@@ -97,8 +103,9 @@ public class ColumnDescription implements Cloneable{
 	 * @param channel file channel
 	 * @param pos position in channel
 	 * @param size buffer size
+	 * @return next iteration start seek pos
 	 */
-	public int readObject(FileChannel channel,long pos, int size) throws IOException, ClassNotFoundException {
+	public long readObject(FileChannel channel,long pos, int size) throws IOException, ClassNotFoundException {
 		ByteBuffer buffer=ByteBuffer.allocateDirect(size);
 		channel.read(buffer,pos);
 
@@ -123,7 +130,7 @@ public class ColumnDescription implements Cloneable{
 			sb.append(buffer.getChar(12+s1*2+s2*2+i*2));
 		}
 		type=Class.forName(sb.toString());
-		return 12+(name.length()+comment.length()+sb.length())*2;
+		return pos+12+(name.length()+comment.length()+sb.length())*2;
 	}
 
 	@Override
