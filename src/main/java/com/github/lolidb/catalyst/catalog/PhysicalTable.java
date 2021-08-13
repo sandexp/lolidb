@@ -8,15 +8,10 @@ import com.github.lolidb.utils.ConfigureReader;
 import java.io.File;
 import java.nio.ByteBuffer;
 
-public class PhysicalTable extends Table{
+public class PhysicalTable{
 
 	// partial config reader
 	protected ConfigureReader reader=ConfigureReader.getInstance();
-
-	public PhysicalTable(String tableName, File location, StructValue schema) {
-		super(tableName, location, schema);
-	}
-
 
 	/**
 	 * Load partition into this table from log file, and in the partition, we will load load block list
@@ -34,46 +29,4 @@ public class PhysicalTable extends Table{
 
 	}
 
-	@Override
-	public void open() {
-		assert !super.isAvailable;
-		load();
-		super.isAvailable=true;
-	}
-
-	/**
-	 * Close operation of physical table need to synchronize with log file before
-	 * close table.
-	 */
-	@Override
-	public void close() {
-		assert super.isAvailable;
-		forceWriteLog();
-		super.isAvailable=false;
-	}
-
-	// force to write into log
-	private void forceWriteLog(){
-
-	}
-
-	@Override
-	public void add(Row record) {
-
-	}
-
-	@Override
-	public void remove(Row record) {
-
-	}
-
-	@Override
-	public void get(Row record) {
-
-	}
-
-	@Override
-	public ByteBuffer[] scan(Partition partition) {
-		return new ByteBuffer[0];
-	}
 }
